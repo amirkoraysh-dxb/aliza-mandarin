@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aliza's Mandarin Playground</title>
+  <style>
+    :root {
+      --bg-color: #FFF9F0;
+      --card-bg: #FFFFFF;
+      --accent: #FF7B90;
+      --accent-alt: #4EBBFF;
+      --text-main: #2E2E2E;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: var(--font-family);
+      background: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      color: #FF5A79;
+      font-weight: 800;
+    }
+    .topic-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .topic-btn {
+      background: #FFFFFF;
+      border: 2px solid #E2E8F0;
+      padding: 8px 18px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      transition: all 0.2s ease;
+    }
+    .topic-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+      transform: scale(1.04);
+    }
+    .mode-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .mode-btn {
+      background: #E8F5FF;
+      border: 1.5px solid #BAE3FF;
+      color: #0076CE;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      background: #0084EA;
+      color: #FFFFFF;
+      border-color: #0084EA;
+    }
+    /* Game Grid */
+    #grid {
+      display: grid;
+      gap: 14px;
+      width: 100%;
+      max-width: 600px;
+      perspective: 1000px;
+    }
+    .grid-4x2 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3x2 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      aspect-ratio: 1 / 1.1;
+      background: var(--card-bg);
+      border-radius: 18px;
+      border: 3px solid #F0ECE4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      text-align: center;
+      padding: 8px;
+    }
+    .card:active { transform: scale(0.96); }
+    .card.hidden-face {
+      background: linear-gradient(135deg, #FFC1CC 0%, #FF94AA 100%);
+      border-color: #FFA5BA;
+      color: transparent;
+    }
+    .card.matched {
+      border-color: #52C41A;
+      background: #F6FFED;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+    .card-icon { font-size: 32px; margin-bottom: 4px; }
+    .card-hanzi { font-size: 28px; font-weight: 800; color: #1F2937; line-height: 1.1; }
+    .card-pinyin { font-size: 14px; color: #6B7280; font-weight: 600; margin-top: 2px; }
+    .card-english { font-size: 16px; font-weight: 700; color: #374151; }
+
+    /* Audio Prompt Box for Listen Mode */
+    #audio-prompt {
+      display: none;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .listen-bubble {
+      background: #FFF0F3;
+      border: 2px dashed #FF7B90;
+      padding: 12px 24px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #D62847;
+      cursor: pointer;
+    }
+    .win-banner {
+      display: none;
+      font-size: 20px;
+      font-weight: 800;
+      color: #389E0D;
+      background: #F6FFED;
+      border: 2px solid #B7EB8F;
+      padding: 12px 24px;
+      border-radius: 20px;
+      margin-top: 16px;
+      animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes pop {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🌸 Aliza's Mandarin Playground</h1>
+  </header>
+
+  <div class="topic-bar" id="topicBar"></div>
+
+  <div class="mode-bar">
+    <button class="mode-btn active" id="btnModeMemory" onclick="setMode('memory')">🃏 Memory Flip</button>
+    <button class="mode-btn" id="btnModeListen" onclick="setMode('listen')">🔊 Listen & Find</button>
+  </div>
+
+  <div id="audio-prompt">
+    <div class="listen-bubble" onclick="playCurrentPrompt()">
+      <span>🔊 Tap to hear word again</span>
+    </div>
+  </div>
+
+  <div id="grid" class="grid-4x2"></div>
+
+  <div id="winBanner" class="win-banner">🎉 太棒了! (Well Done, Aliza!) 🎉</div>
+
+  <script>
+    // --- LESSON DATA REPOSITORY ---
+    // (This list gets expanded whenever you share new lesson PDFs)
+    const LESSONS = {
+      animals: {
+        name: "🐶 Animals (动物)",
+        words: [
+          { hanzi: "狗", pinyin: "gǒu", en: "Dog", icon: "🐶" },
+          { hanzi: "猫", pinyin: "māo", en: "Cat", icon: "🐱" },
+          { hanzi: "兔子", pinyin: "tù zi", en: "Rabbit", icon: "🐰" },
+          { hanzi: "鸟", pinyin: "niǎo", en: "Bird", icon: "🐦" }
+        ]
+      },
+      fruits: {
+        name: "🍎 Fruits (水果)",
+        words: [
+          { hanzi: "苹果", pinyin: "píng guǒ", en: "Apple", icon: "🍎" },
+          { hanzi: "香蕉", pinyin: "xiāng jiāo", en: "Banana", icon: "🍌" },
+          { hanzi: "西瓜", pinyin: "xī guā", en: "Watermelon", icon: "🍉" },
+          { hanzi: "草莓", pinyin: "cǎo méi", en: "Strawberry", icon: "🍓" }
+        ]
+      },
+      colors: {
+        name: "🎨 Colors (颜色)",
+        words: [
+          { hanzi: "红", pinyin: "hóng", en: "Red", icon: "🔴" },
+          { hanzi: "蓝", pinyin: "lán", en: "Blue", icon: "🔵" },
+          { hanzi: "黄", pinyin: "huáng", en: "Yellow", icon: "🟡" },
+          { hanzi: "绿", pinyin: "lǜ", en: "Green", icon: "🟢" }
+        ]
+      },
+      numbers: {
+        name: "🔢 Numbers (数字)",
+        words: [
+          { hanzi: "一", pinyin: "yī", en: "One (1)", icon: "1️⃣" },
+          { hanzi: "二", pinyin: "èr", en: "Two (2)", icon: "2️⃣" },
+          { hanzi: "三", pinyin: "sān", en: "Three (3)", icon: "3️⃣" },
+          { hanzi: "四", pinyin: "sì", en: "Four (4)", icon: "4️⃣" }
+        ]
+      }
+    };
+
+    let currentTopicKey = 'animals';
+    let currentMode = 'memory'; // 'memory' or 'listen'
+    let flippedCards = [];
+    let lockBoard = false;
+    let targetWord = null;
+
+    // Speech synthesis for iPad
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'zh-CN';
+        utterance.rate = 0.8; // slightly slower for a 4-year-old
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function initTopicBar() {
+      const bar = document.getElementById('topicBar');
+      bar.innerHTML = '';
+      Object.keys(LESSONS).forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = `topic-btn ${key === currentTopicKey ? 'active' : ''}`;
+        btn.innerText = LESSONS[key].name;
+        btn.onclick = () => {
+          currentTopicKey = key;
+          initTopicBar();
+          loadGame();
+        };
+        bar.appendChild(btn);
+      });
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnModeMemory').classList.toggle('active', mode === 'memory');
+      document.getElementById('btnModeListen').classList.toggle('active', mode === 'listen');
+      document.getElementById('audio-prompt').style.display = mode === 'listen' ? 'block' : 'none';
+      loadGame();
+    }
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function loadGame() {
+      const grid = document.getElementById('grid');
+      const winBanner = document.getElementById('winBanner');
+      winBanner.style.display = 'none';
+      grid.innerHTML = '';
+      flippedCards = [];
+      lockBoard = false;
+
+      const items = LESSONS[currentTopicKey].words;
+
+      if (currentMode === 'memory') {
+        // Pairs: 1 Chinese card + 1 English/Icon card
+        let cards = [];
+        items.forEach((item, index) => {
+          cards.push({ id: index, type: 'zh', text: item.hanzi, pinyin: item.pinyin, speak: item.hanzi });
+          cards.push({ id: index, type: 'en', text: item.en, icon: item.icon, speak: item.hanzi });
+        });
+        cards = shuffle(cards);
+        grid.className = 'grid-4x2';
+
+        cards.forEach(cardData => {
+          const card = document.createElement('div');
+          card.className = 'card hidden-face';
+          card.dataset.id = cardData.id;
+
+          card.onclick = () => {
+            if (lockBoard || card.classList.contains('matched') || card === flippedCards[0]?.el) return;
+
+            // Reveal
+            card.classList.remove('hidden-face');
+            if (cardData.type === 'zh') {
+              card.innerHTML = `<div class="card-hanzi">${cardData.text}</div><div class="card-pinyin">${cardData.pinyin}</div>`;
+            } else {
+              card.innerHTML = `<div class="card-icon">${cardData.icon}</div><div class="card-english">${cardData.text}</div>`;
+            }
+            speak(cardData.speak);
+
+            flippedCards.push({ el: card, data: cardData });
+
+            if (flippedCards.length === 2) {
+              lockBoard = true;
+              const [first, second] = flippedCards;
+              if (first.data.id === second.data.id) {
+                // Match
+                setTimeout(() => {
+                  first.el.classList.add('matched');
+                  second.el.classList.add('matched');
+                  flippedCards = [];
+                  lockBoard = false;
+                  checkWin();
+                }, 400);
+              } else {
+                // Not a match
+                setTimeout(() => {
+                  first.el.classList.add('hidden-face');
+                  second.el.classList.add('hidden-face');
+                  first.el.innerHTML = '';
+                  second.el.innerHTML = '';
+                  flippedCards = [];
+                  lockBoard = false;
+                }, 900);
+              }
+            }
+          };
+          grid.appendChild(card);
+        });
+
+      } else {
+        // Listen & Match Mode
+        grid.className = 'grid-4x2';
+        targetWord = items[Math.floor(Math.random() * items.length)];
+        setTimeout(() => speak(targetWord.hanzi), 300);
+
+        shuffle([...items]).forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-icon">${item.icon}</div>
+            <div class="card-hanzi">${item.hanzi}</div>
+            <div class="card-english">${item.en}</div>
+          `;
+
+          card.onclick = () => {
+            if (item.hanzi === targetWord.hanzi) {
+              card.classList.add('matched');
+              speak("对了! " + item.hanzi); // "Correct!"
+              setTimeout(() => {
+                winBanner.style.display = 'block';
+                setTimeout(loadGame, 1400);
+              }, 400);
+            } else {
+              speak("不正确");
+              card.style.borderColor = '#FF4D4F';
+              setTimeout(() => card.style.borderColor = '#F0ECE4', 500);
+            }
+          };
+          grid.appendChild(card);
+        });
+      }
+    }
+
+    function playCurrentPrompt() {
+      if (targetWord) speak(targetWord.hanzi);
+    }
+
+    function checkWin() {
+      const allMatched = document.querySelectorAll('.card.matched').length;
+      const total = LESSONS[currentTopicKey].words.length * 2;
+      if (allMatched === total) {
+        document.getElementById('winBanner').style.display = 'block';
+      }
+    }
+
+    // Initialize
+    initTopicBar();
+    loadGame();
+  </script>
+</body>
+</html>
