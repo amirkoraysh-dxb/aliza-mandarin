@@ -6,157 +6,275 @@
   <title>Aliza's Mandarin Playground</title>
   <style>
     :root {
-      --bg-color: #FFF9F0;
+      --bg-gradient: linear-gradient(135deg, #FFF6E5 0%, #FFE9EC 100%);
       --card-bg: #FFFFFF;
-      --accent: #FF7B90;
-      --accent-alt: #4EBBFF;
-      --text-main: #2E2E2E;
-      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+      --primary: #FF5A79;
+      --primary-light: #FFE4E8;
+      --secondary: #3B82F6;
+      --secondary-light: #EBF5FF;
+      --success: #10B981;
+      --success-light: #ECFDF5;
+      --border-color: #F1E5D8;
+      --text-dark: #1F2937;
+      --text-sub: #6B7280;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
     body {
       margin: 0;
       padding: 16px;
-      font-family: var(--font-family);
-      background: var(--bg-color);
-      color: var(--text-main);
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
+      color: var(--text-dark);
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      user-select: none;
     }
+
+    /* Header */
     header {
       text-align: center;
       margin-bottom: 12px;
     }
+
     h1 {
       margin: 0;
       font-size: 26px;
-      color: #FF5A79;
       font-weight: 800;
+      color: var(--primary);
+      text-shadow: 0 2px 4px rgba(255, 90, 121, 0.15);
     }
-    .topic-bar {
+
+    /* Category Topics */
+    .topics-container {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 12px;
+      max-width: 650px;
     }
-    .topic-btn {
+
+    .topic-pill {
       background: #FFFFFF;
-      border: 2px solid #E2E8F0;
-      padding: 8px 18px;
-      border-radius: 24px;
-      font-size: 16px;
-      font-weight: 600;
+      border: 2px solid var(--border-color);
+      border-radius: 30px;
+      padding: 7px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-dark);
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
       transition: all 0.2s ease;
     }
-    .topic-btn.active {
-      background: var(--accent);
+
+    .topic-pill:active { transform: scale(0.95); }
+
+    .topic-pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
       color: #FFFFFF;
-      border-color: var(--accent);
-      transform: scale(1.04);
+      box-shadow: 0 4px 10px rgba(255, 90, 121, 0.35);
+      transform: scale(1.03);
     }
-    .mode-bar {
+
+    /* Game Mode Switcher */
+    .mode-container {
       display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
+
     .mode-btn {
-      background: #E8F5FF;
-      border: 1.5px solid #BAE3FF;
-      color: #0076CE;
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 12px;
+      background: #FFFFFF;
+      border: 2px solid var(--secondary-light);
+      color: var(--secondary);
       font-size: 14px;
+      font-weight: 800;
+      padding: 7px 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background: var(--secondary);
+      border-color: var(--secondary);
+      color: #FFFFFF;
+      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Difficulty Toggles */
+    .toggles-container {
+      display: flex;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1.5px solid #F0E3D5;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #4B5563;
       cursor: pointer;
     }
-    .mode-btn.active {
-      background: #0084EA;
-      color: #FFFFFF;
-      border-color: #0084EA;
-    }
-    /* Game Grid */
-    #grid {
-      display: grid;
-      gap: 14px;
-      width: 100%;
-      max-width: 600px;
-      perspective: 1000px;
-    }
-    .grid-4x2 { grid-template-columns: repeat(4, 1fr); }
-    .grid-3x2 { grid-template-columns: repeat(3, 1fr); }
 
+    .toggle-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Audio Speaker Prompt in Listen Mode */
+    #listenPromptBox {
+      display: none;
+      margin-bottom: 14px;
+    }
+
+    .speaker-bubble {
+      background: var(--primary-light);
+      border: 2px dashed var(--primary);
+      color: var(--primary);
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(255, 90, 121, 0.15);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    /* Board Grid */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 620px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      #board { gap: 8px; }
+    }
+
+    /* Cards */
     .card {
-      aspect-ratio: 1 / 1.1;
+      aspect-ratio: 1 / 1.15;
       background: var(--card-bg);
-      border-radius: 18px;
-      border: 3px solid #F0ECE4;
+      border-radius: 20px;
+      border: 3px solid #F3EDE4;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, background-color 0.2s ease;
+      padding: 6px;
       text-align: center;
-      padding: 8px;
     }
-    .card:active { transform: scale(0.96); }
-    .card.hidden-face {
-      background: linear-gradient(135deg, #FFC1CC 0%, #FF94AA 100%);
-      border-color: #FFA5BA;
-      color: transparent;
-    }
-    .card.matched {
-      border-color: #52C41A;
-      background: #F6FFED;
-      opacity: 0.85;
-      pointer-events: none;
-    }
-    .card-icon { font-size: 32px; margin-bottom: 4px; }
-    .card-hanzi { font-size: 26px; font-weight: 800; color: #1F2937; line-height: 1.1; }
-    .card-pinyin { font-size: 13px; color: #6B7280; font-weight: 600; margin-top: 2px; }
-    .card-english { font-size: 15px; font-weight: 700; color: #374151; }
 
-    /* Audio Prompt Box for Listen Mode */
-    #audio-prompt {
-      display: none;
-      margin-bottom: 16px;
-      text-align: center;
+    .card:active { transform: scale(0.94); }
+
+    .card.backside {
+      background: linear-gradient(135deg, #FFB2C3 0%, #FF7F9B 100%);
+      border-color: #FFA5BA;
     }
-    .listen-bubble {
-      background: #FFF0F3;
-      border: 2px dashed #FF7B90;
-      padding: 12px 24px;
-      border-radius: 30px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 18px;
+
+    .card.backside::after {
+      content: "🌸";
+      font-size: 32px;
+    }
+
+    .card.matched {
+      background: var(--success-light);
+      border-color: var(--success);
+      transform: scale(0.96);
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    /* Typography inside Cards */
+    .card-icon {
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 4px;
+      transition: opacity 0.2s ease;
+    }
+
+    .card-hanzi {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-dark);
+      line-height: 1.15;
+    }
+
+    .card-pinyin {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-top: 3px;
+    }
+
+    .card-english {
+      font-size: 14px;
       font-weight: 700;
-      color: #D62847;
-      cursor: pointer;
+      color: #4B5563;
+      margin-top: 2px;
+      transition: opacity 0.2s ease;
     }
-    .win-banner {
+
+    /* Utility classes triggered by checkboxes */
+    body.hide-english .card-english {
+      display: none !important;
+    }
+
+    body.hide-pictures .card-icon {
+      display: none !important;
+    }
+
+    /* Win Banner */
+    .win-modal {
       display: none;
+      background: var(--success-light);
+      border: 3px solid var(--success);
+      color: #065F46;
       font-size: 20px;
       font-weight: 800;
-      color: #389E0D;
-      background: #F6FFED;
-      border: 2px solid #B7EB8F;
       padding: 12px 24px;
-      border-radius: 20px;
-      margin-top: 16px;
-      animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-radius: 25px;
+      text-align: center;
+      margin-top: 8px;
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    @keyframes pop {
-      0% { transform: scale(0.6); opacity: 0; }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
   </style>
@@ -167,29 +285,54 @@
     <h1>🌸 Aliza's Mandarin Playground</h1>
   </header>
 
-  <div class="topic-bar" id="topicBar"></div>
+  <!-- Categories -->
+  <div class="topics-container" id="topicList"></div>
 
-  <div class="mode-bar">
-    <button class="mode-btn active" id="btnModeMemory" onclick="setMode('memory')">🃏 Memory Flip</button>
-    <button class="mode-btn" id="btnModeListen" onclick="setMode('listen')">🔊 Listen & Find</button>
+  <!-- Modes -->
+  <div class="mode-container">
+    <button class="mode-btn active" id="btnMemory" onclick="switchMode('memory')">🃏 Memory Flip</button>
+    <button class="mode-btn" id="btnListen" onclick="switchMode('listen')">🔊 Listen & Pop</button>
   </div>
 
-  <div id="audio-prompt">
-    <div class="listen-bubble" onclick="playCurrentPrompt()">
+  <!-- Difficulty Controls (Tick boxes) -->
+  <div class="toggles-container">
+    <label class="toggle-label">
+      <input type="checkbox" id="toggleEnglish" checked onchange="toggleDifficulty()">
+      <span>Show English</span>
+    </label>
+    <label class="toggle-label">
+      <input type="checkbox" id="togglePictures" checked onchange="toggleDifficulty()">
+      <span>Show Pictures</span>
+    </label>
+  </div>
+
+  <!-- Audio Prompt for Listen Mode -->
+  <div id="listenPromptBox">
+    <div class="speaker-bubble" onclick="replayAudioPrompt()">
       <span>🔊 Tap to hear word again</span>
     </div>
   </div>
 
-  <div id="grid" class="grid-4x2"></div>
+  <!-- Grid -->
+  <div id="board"></div>
 
-  <div id="winBanner" class="win-banner">🎉 太棒了! (Well Done, Aliza!) 🎉</div>
+  <!-- Win Banner -->
+  <div id="winBanner" class="win-modal">🎉 太棒了! (Well done, Aliza!) 🎉</div>
 
   <script>
-    // --- LESSON DATA REPOSITORY ---
     const LESSONS = {
+      colors: {
+        title: "🎨 Colors (颜色)",
+        items: [
+          { hanzi: "绿色", pinyin: "lǜ sè", en: "Green colour", icon: "🟢" },
+          { hanzi: "红色", pinyin: "hóng sè", en: "Red colour", icon: "🔴" },
+          { hanzi: "蓝色", pinyin: "lán sè", en: "Blue colour", icon: "🔵" },
+          { hanzi: "黄色", pinyin: "huáng sè", en: "Yellow colour", icon: "🟡" }
+        ]
+      },
       animals: {
-        name: "🐶 Animals (动物)",
-        words: [
+        title: "🐶 Animals (动物)",
+        items: [
           { hanzi: "狗", pinyin: "gǒu", en: "Dog", icon: "🐶" },
           { hanzi: "猫", pinyin: "māo", en: "Cat", icon: "🐱" },
           { hanzi: "兔子", pinyin: "tù zi", en: "Rabbit", icon: "🐰" },
@@ -197,26 +340,17 @@
         ]
       },
       fruits: {
-        name: "🍎 Fruits (水果)",
-        words: [
+        title: "🍎 Fruits (水果)",
+        items: [
           { hanzi: "苹果", pinyin: "píng guǒ", en: "Apple", icon: "🍎" },
           { hanzi: "香蕉", pinyin: "xiāng jiāo", en: "Banana", icon: "🍌" },
           { hanzi: "西瓜", pinyin: "xī guā", en: "Watermelon", icon: "🍉" },
           { hanzi: "草莓", pinyin: "cǎo méi", en: "Strawberry", icon: "🍓" }
         ]
       },
-      colors: {
-        name: "🎨 Colors (颜色)",
-        words: [
-          { hanzi: "绿色", pinyin: "lǜ sè", en: "Green colour", icon: "🟢" },
-          { hanzi: "红色", pinyin: "hóng sè", en: "Red colour", icon: "🔴" },
-          { hanzi: "蓝色", pinyin: "lán sè", en: "Blue colour", icon: "🔵" },
-          { hanzi: "黄色", pinyin: "huáng sè", en: "Yellow colour", icon: "🟡" }
-        ]
-      },
       numbers: {
-        name: "🔢 Numbers (数字)",
-        words: [
+        title: "🔢 Numbers (数字)",
+        items: [
           { hanzi: "一", pinyin: "yī", en: "One (1)", icon: "1️⃣" },
           { hanzi: "二", pinyin: "èr", en: "Two (2)", icon: "2️⃣" },
           { hanzi: "三", pinyin: "sān", en: "Three (3)", icon: "3️⃣" },
@@ -225,161 +359,176 @@
       }
     };
 
-    let currentTopicKey = 'colors';
-    let currentMode = 'memory'; // 'memory' or 'listen'
-    let flippedCards = [];
-    let lockBoard = false;
+    let currentTopic = 'colors';
+    let currentMode = 'memory';
+    let memoryFlipped = [];
+    let isBoardLocked = false;
     let targetWord = null;
 
-    // Native text-to-speech for iPad Safari
-    function speak(text) {
+    function speakWord(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-CN';
-        utterance.rate = 0.8; // Gentle speed for a 4-year-old
+        utterance.rate = 0.8;
+        utterance.pitch = 1.1;
         window.speechSynthesis.speak(utterance);
       }
     }
 
-    function initTopicBar() {
-      const bar = document.getElementById('topicBar');
-      bar.innerHTML = '';
+    function toggleDifficulty() {
+      const showEn = document.getElementById('toggleEnglish').checked;
+      const showPic = document.getElementById('togglePictures').checked;
+      
+      document.body.classList.toggle('hide-english', !showEn);
+      document.body.classList.toggle('hide-pictures', !showPic);
+    }
+
+    function renderTopicList() {
+      const container = document.getElementById('topicList');
+      container.innerHTML = '';
       Object.keys(LESSONS).forEach(key => {
         const btn = document.createElement('button');
-        btn.className = `topic-btn ${key === currentTopicKey ? 'active' : ''}`;
-        btn.innerText = LESSONS[key].name;
+        btn.className = `topic-pill ${key === currentTopic ? 'active' : ''}`;
+        btn.innerText = LESSONS[key].title;
         btn.onclick = () => {
-          currentTopicKey = key;
-          initTopicBar();
-          loadGame();
+          currentTopic = key;
+          renderTopicList();
+          initRound();
         };
-        bar.appendChild(btn);
+        container.appendChild(btn);
       });
     }
 
-    function setMode(mode) {
+    function switchMode(mode) {
       currentMode = mode;
-      document.getElementById('btnModeMemory').classList.toggle('active', mode === 'memory');
-      document.getElementById('btnModeListen').classList.toggle('active', mode === 'listen');
-      document.getElementById('audio-prompt').style.display = mode === 'listen' ? 'block' : 'none';
-      loadGame();
+      document.getElementById('btnMemory').classList.toggle('active', mode === 'memory');
+      document.getElementById('btnListen').classList.toggle('active', mode === 'listen');
+      document.getElementById('listenPromptBox').style.display = mode === 'listen' ? 'block' : 'none';
+      initRound();
     }
 
-    function shuffle(array) {
-      return array.sort(() => Math.random() - 0.5);
+    function shuffleArray(arr) {
+      return arr.slice().sort(() => Math.random() - 0.5);
     }
 
-    function loadGame() {
-      const grid = document.getElementById('grid');
+    function initRound() {
+      const board = document.getElementById('board');
       const winBanner = document.getElementById('winBanner');
+      board.innerHTML = '';
       winBanner.style.display = 'none';
-      grid.innerHTML = '';
-      flippedCards = [];
-      lockBoard = false;
+      memoryFlipped = [];
+      isBoardLocked = false;
 
-      const items = LESSONS[currentTopicKey].words;
+      const words = LESSONS[currentTopic].items;
 
       if (currentMode === 'memory') {
-        let cards = [];
-        items.forEach((item, index) => {
-          cards.push({ id: index, type: 'zh', text: item.hanzi, pinyin: item.pinyin, speak: item.hanzi });
-          cards.push({ id: index, type: 'en', text: item.en, icon: item.icon, speak: item.hanzi });
+        let deck = [];
+        words.forEach((item, id) => {
+          deck.push({ id, kind: 'zh', data: item });
+          deck.push({ id, kind: 'en', data: item });
         });
-        cards = shuffle(cards);
-        grid.className = 'grid-4x2';
+        deck = shuffleArray(deck);
 
-        cards.forEach(cardData => {
-          const card = document.createElement('div');
-          card.className = 'card hidden-face';
-          card.dataset.id = cardData.id;
+        deck.forEach(cardInfo => {
+          const cardEl = document.createElement('div');
+          cardEl.className = 'card backside';
+          cardEl.dataset.id = cardInfo.id;
 
-          card.onclick = () => {
-            if (lockBoard || card.classList.contains('matched') || card === flippedCards[0]?.el) return;
+          cardEl.onclick = () => {
+            if (isBoardLocked || cardEl.classList.contains('matched') || cardEl === memoryFlipped[0]?.el) return;
 
-            card.classList.remove('hidden-face');
-            if (cardData.type === 'zh') {
-              card.innerHTML = `<div class="card-hanzi">${cardData.text}</div><div class="card-pinyin">${cardData.pinyin}</div>`;
+            cardEl.classList.remove('backside');
+            if (cardInfo.kind === 'zh') {
+              cardEl.innerHTML = `
+                <div class="card-hanzi">${cardInfo.data.hanzi}</div>
+                <div class="card-pinyin">${cardInfo.data.pinyin}</div>
+              `;
             } else {
-              card.innerHTML = `<div class="card-icon">${cardData.icon}</div><div class="card-english">${cardData.text}</div>`;
+              cardEl.innerHTML = `
+                <div class="card-icon">${cardInfo.data.icon}</div>
+                <div class="card-english">${cardInfo.data.en}</div>
+              `;
             }
-            speak(cardData.speak);
 
-            flippedCards.push({ el: card, data: cardData });
+            speakWord(cardInfo.data.hanzi);
+            memoryFlipped.push({ el: cardEl, info: cardInfo });
 
-            if (flippedCards.length === 2) {
-              lockBoard = true;
-              const [first, second] = flippedCards;
-              if (first.data.id === second.data.id) {
+            if (memoryFlipped.length === 2) {
+              isBoardLocked = true;
+              const [first, second] = memoryFlipped;
+
+              if (first.info.id === second.info.id) {
                 setTimeout(() => {
                   first.el.classList.add('matched');
                   second.el.classList.add('matched');
-                  flippedCards = [];
-                  lockBoard = false;
-                  checkWin();
+                  memoryFlipped = [];
+                  isBoardLocked = false;
+                  verifyVictory(words.length * 2);
                 }, 400);
               } else {
                 setTimeout(() => {
-                  first.el.classList.add('hidden-face');
-                  second.el.classList.add('hidden-face');
+                  first.el.classList.add('backside');
+                  second.el.classList.add('backside');
                   first.el.innerHTML = '';
                   second.el.innerHTML = '';
-                  flippedCards = [];
-                  lockBoard = false;
+                  memoryFlipped = [];
+                  isBoardLocked = false;
                 }, 900);
               }
             }
           };
-          grid.appendChild(card);
+
+          board.appendChild(cardEl);
         });
 
       } else {
-        grid.className = 'grid-4x2';
-        targetWord = items[Math.floor(Math.random() * items.length)];
-        setTimeout(() => speak(targetWord.hanzi), 300);
+        targetWord = words[Math.floor(Math.random() * words.length)];
+        setTimeout(() => speakWord(targetWord.hanzi), 350);
 
-        shuffle([...items]).forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
+        shuffleArray(words).forEach(item => {
+          const cardEl = document.createElement('div');
+          cardEl.className = 'card';
+          cardEl.innerHTML = `
             <div class="card-icon">${item.icon}</div>
             <div class="card-hanzi">${item.hanzi}</div>
             <div class="card-english">${item.en}</div>
           `;
 
-          card.onclick = () => {
+          cardEl.onclick = () => {
             if (item.hanzi === targetWord.hanzi) {
-              card.classList.add('matched');
-              speak("对了! " + item.hanzi);
+              cardEl.classList.add('matched');
+              speakWord("对了! " + item.hanzi);
               setTimeout(() => {
                 winBanner.style.display = 'block';
-                setTimeout(loadGame, 1400);
+                setTimeout(initRound, 1400);
               }, 400);
             } else {
-              speak("不正确");
-              card.style.borderColor = '#FF4D4F';
-              setTimeout(() => card.style.borderColor = '#F0ECE4', 500);
+              speakWord("不对哦");
+              cardEl.style.borderColor = '#EF4444';
+              setTimeout(() => cardEl.style.borderColor = '#F3EDE4', 600);
             }
           };
-          grid.appendChild(card);
+
+          board.appendChild(cardEl);
         });
       }
     }
 
-    function playCurrentPrompt() {
-      if (targetWord) speak(targetWord.hanzi);
+    function replayAudioPrompt() {
+      if (targetWord) speakWord(targetWord.hanzi);
     }
 
-    function checkWin() {
-      const allMatched = document.querySelectorAll('.card.matched').length;
-      const total = LESSONS[currentTopicKey].words.length * 2;
-      if (allMatched === total) {
+    function verifyVictory(expectedTotal) {
+      const matched = document.querySelectorAll('.card.matched').length;
+      if (matched === expectedTotal) {
         document.getElementById('winBanner').style.display = 'block';
       }
     }
 
-    initTopicBar();
-    loadGame();
+    renderTopicList();
+    initRound();
+    toggleDifficulty();
   </script>
 </body>
 </html>
