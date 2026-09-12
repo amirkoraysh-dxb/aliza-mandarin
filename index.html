@@ -120,9 +120,9 @@
       pointer-events: none;
     }
     .card-icon { font-size: 32px; margin-bottom: 4px; }
-    .card-hanzi { font-size: 28px; font-weight: 800; color: #1F2937; line-height: 1.1; }
-    .card-pinyin { font-size: 14px; color: #6B7280; font-weight: 600; margin-top: 2px; }
-    .card-english { font-size: 16px; font-weight: 700; color: #374151; }
+    .card-hanzi { font-size: 26px; font-weight: 800; color: #1F2937; line-height: 1.1; }
+    .card-pinyin { font-size: 13px; color: #6B7280; font-weight: 600; margin-top: 2px; }
+    .card-english { font-size: 15px; font-weight: 700; color: #374151; }
 
     /* Audio Prompt Box for Listen Mode */
     #audio-prompt {
@@ -186,7 +186,6 @@
 
   <script>
     // --- LESSON DATA REPOSITORY ---
-    // (This list gets expanded whenever you share new lesson PDFs)
     const LESSONS = {
       animals: {
         name: "🐶 Animals (动物)",
@@ -209,10 +208,10 @@
       colors: {
         name: "🎨 Colors (颜色)",
         words: [
-          { hanzi: "红", pinyin: "hóng", en: "Red", icon: "🔴" },
-          { hanzi: "蓝", pinyin: "lán", en: "Blue", icon: "🔵" },
-          { hanzi: "黄", pinyin: "huáng", en: "Yellow", icon: "🟡" },
-          { hanzi: "绿", pinyin: "lǜ", en: "Green", icon: "🟢" }
+          { hanzi: "绿色", pinyin: "lǜ sè", en: "Green colour", icon: "🟢" },
+          { hanzi: "红色", pinyin: "hóng sè", en: "Red colour", icon: "🔴" },
+          { hanzi: "蓝色", pinyin: "lán sè", en: "Blue colour", icon: "🔵" },
+          { hanzi: "黄色", pinyin: "huáng sè", en: "Yellow colour", icon: "🟡" }
         ]
       },
       numbers: {
@@ -226,19 +225,19 @@
       }
     };
 
-    let currentTopicKey = 'animals';
+    let currentTopicKey = 'colors';
     let currentMode = 'memory'; // 'memory' or 'listen'
     let flippedCards = [];
     let lockBoard = false;
     let targetWord = null;
 
-    // Speech synthesis for iPad
+    // Native text-to-speech for iPad Safari
     function speak(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'zh-CN';
-        utterance.rate = 0.8; // slightly slower for a 4-year-old
+        utterance.rate = 0.8; // Gentle speed for a 4-year-old
         window.speechSynthesis.speak(utterance);
       }
     }
@@ -282,7 +281,6 @@
       const items = LESSONS[currentTopicKey].words;
 
       if (currentMode === 'memory') {
-        // Pairs: 1 Chinese card + 1 English/Icon card
         let cards = [];
         items.forEach((item, index) => {
           cards.push({ id: index, type: 'zh', text: item.hanzi, pinyin: item.pinyin, speak: item.hanzi });
@@ -299,7 +297,6 @@
           card.onclick = () => {
             if (lockBoard || card.classList.contains('matched') || card === flippedCards[0]?.el) return;
 
-            // Reveal
             card.classList.remove('hidden-face');
             if (cardData.type === 'zh') {
               card.innerHTML = `<div class="card-hanzi">${cardData.text}</div><div class="card-pinyin">${cardData.pinyin}</div>`;
@@ -314,7 +311,6 @@
               lockBoard = true;
               const [first, second] = flippedCards;
               if (first.data.id === second.data.id) {
-                // Match
                 setTimeout(() => {
                   first.el.classList.add('matched');
                   second.el.classList.add('matched');
@@ -323,7 +319,6 @@
                   checkWin();
                 }, 400);
               } else {
-                // Not a match
                 setTimeout(() => {
                   first.el.classList.add('hidden-face');
                   second.el.classList.add('hidden-face');
@@ -339,7 +334,6 @@
         });
 
       } else {
-        // Listen & Match Mode
         grid.className = 'grid-4x2';
         targetWord = items[Math.floor(Math.random() * items.length)];
         setTimeout(() => speak(targetWord.hanzi), 300);
@@ -356,7 +350,7 @@
           card.onclick = () => {
             if (item.hanzi === targetWord.hanzi) {
               card.classList.add('matched');
-              speak("对了! " + item.hanzi); // "Correct!"
+              speak("对了! " + item.hanzi);
               setTimeout(() => {
                 winBanner.style.display = 'block';
                 setTimeout(loadGame, 1400);
@@ -384,7 +378,6 @@
       }
     }
 
-    // Initialize
     initTopicBar();
     loadGame();
   </script>
