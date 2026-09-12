@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Aliza's Mandarin Playground</title>
+  <!-- Confetti library for smooth celebration animation -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #FFF6E5 0%, #FFE9EC 100%);
+      --bg-gradient: linear-gradient(135deg, #FFF7EA 0%, #FFEBF0 100%);
       --card-bg: #FFFFFF;
       --primary: #FF5A79;
       --primary-light: #FFE4E8;
@@ -14,6 +16,7 @@
       --secondary-light: #EBF5FF;
       --success: #10B981;
       --success-light: #ECFDF5;
+      --danger: #EF4444;
       --border-color: #F1E5D8;
       --text-dark: #1F2937;
       --text-sub: #6B7280;
@@ -28,7 +31,7 @@
 
     body {
       margin: 0;
-      padding: 16px;
+      padding: 14px 12px;
       min-height: 100vh;
       background: var(--bg-gradient);
       font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
@@ -36,12 +39,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow-x: hidden;
     }
 
-    /* Header */
     header {
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     h1 {
@@ -58,20 +61,20 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       max-width: 650px;
     }
 
     .topic-pill {
       background: #FFFFFF;
       border: 2px solid var(--border-color);
-      border-radius: 30px;
-      padding: 7px 16px;
-      font-size: 15px;
+      border-radius: 25px;
+      padding: 6px 14px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-dark);
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
       transition: all 0.2s ease;
     }
 
@@ -85,11 +88,11 @@
       transform: scale(1.03);
     }
 
-    /* Game Mode Switcher */
+    /* Mode Switcher */
     .mode-container {
       display: flex;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .mode-btn {
@@ -98,7 +101,7 @@
       color: var(--secondary);
       font-size: 14px;
       font-weight: 800;
-      padding: 7px 16px;
+      padding: 6px 16px;
       border-radius: 14px;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -115,32 +118,78 @@
     .toggles-container {
       display: flex;
       gap: 16px;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 8px 18px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 6px 16px;
       border-radius: 20px;
       border: 1.5px solid #F0E3D5;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+      margin-bottom: 12px;
     }
 
     .toggle-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: #4B5563;
       cursor: pointer;
     }
 
     .toggle-label input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       accent-color: var(--primary);
       cursor: pointer;
     }
 
-    /* Audio Speaker Prompt in Listen Mode */
+    /* 10 Questions Light Bulb Indicator */
+    .score-lights-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 2px solid #E5E7EB;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      margin-bottom: 14px;
+    }
+
+    .q-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-right: 2px;
+    }
+
+    .bulb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #E5E7EB;
+      border: 2px solid #D1D5DB;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .bulb.current {
+      border-color: var(--primary);
+      box-shadow: 0 0 6px var(--primary);
+      transform: scale(1.15);
+    }
+
+    .bulb.green {
+      background: #10B981;
+      border-color: #059669;
+      box-shadow: 0 0 8px #10B981;
+    }
+
+    .bulb.red {
+      background: #EF4444;
+      border-color: #DC2626;
+      box-shadow: 0 0 8px #EF4444;
+    }
+
+    /* Prompt Box for Listen Mode */
     #listenPromptBox {
       display: none;
       margin-bottom: 14px;
@@ -158,8 +207,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 10px rgba(255, 90, 121, 0.15);
-      animation: pulse 2s infinite;
+      animation: pulse 1.8s infinite;
     }
 
     @keyframes pulse {
@@ -167,7 +215,7 @@
       50% { transform: scale(1.03); }
     }
 
-    /* Board Grid */
+    /* Cards Grid */
     #board {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -181,7 +229,6 @@
       #board { gap: 8px; }
     }
 
-    /* Cards */
     .card {
       aspect-ratio: 1 / 1.15;
       background: var(--card-bg);
@@ -194,7 +241,7 @@
       cursor: pointer;
       box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
       position: relative;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, background-color 0.2s ease;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease;
       padding: 6px;
       text-align: center;
     }
@@ -219,64 +266,84 @@
       opacity: 0.9;
     }
 
-    /* Typography inside Cards */
-    .card-icon {
-      font-size: 34px;
-      line-height: 1;
-      margin-bottom: 4px;
-      transition: opacity 0.2s ease;
-    }
+    /* Card Details */
+    .card-icon { font-size: 34px; line-height: 1; margin-bottom: 4px; }
+    .card-hanzi { font-size: 30px; font-weight: 800; color: var(--text-dark); line-height: 1.15; }
+    .card-pinyin { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 3px; }
+    .card-english { font-size: 13px; font-weight: 700; color: #4B5563; margin-top: 2px; }
 
-    .card-hanzi {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--text-dark);
-      line-height: 1.15;
-    }
+    body.hide-english .card-english { display: none !important; }
+    body.hide-pictures .card-icon { display: none !important; }
 
-    .card-pinyin {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-sub);
-      margin-top: 3px;
-    }
-
-    .card-english {
-      font-size: 14px;
-      font-weight: 700;
-      color: #4B5563;
-      margin-top: 2px;
-      transition: opacity 0.2s ease;
-    }
-
-    /* Utility classes triggered by checkboxes */
-    body.hide-english .card-english {
-      display: none !important;
-    }
-
-    body.hide-pictures .card-icon {
-      display: none !important;
-    }
-
-    /* Win Banner */
-    .win-modal {
+    /* End of 10-Question Round Modal Overlay */
+    .modal-overlay {
       display: none;
-      background: var(--success-light);
-      border: 3px solid var(--success);
-      color: #065F46;
-      font-size: 20px;
-      font-weight: 800;
-      padding: 12px 24px;
-      border-radius: 25px;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: 30px;
+      padding: 28px 24px;
+      max-width: 400px;
+      width: 100%;
       text-align: center;
-      margin-top: 8px;
-      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     @keyframes popIn {
-      0% { transform: scale(0.5); opacity: 0; }
+      0% { transform: scale(0.6); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+
+    /* Dancing Panda Animation */
+    .panda-dancer {
+      font-size: 80px;
+      display: inline-block;
+      margin-bottom: 8px;
+      animation: pandaDance 0.7s infinite alternate ease-in-out;
+    }
+
+    @keyframes pandaDance {
+      0% { transform: rotate(-12deg) translateY(0) scale(1); }
+      50% { transform: rotate(0deg) translateY(-14px) scale(1.08); }
+      100% { transform: rotate(12deg) translateY(0) scale(1); }
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+    }
+
+    .modal-score {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 18px;
+    }
+
+    .modal-btn {
+      background: var(--primary);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 20px;
+      padding: 12px 28px;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 90, 121, 0.4);
+      transition: transform 0.15s ease;
+    }
+    .modal-btn:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
@@ -290,11 +357,11 @@
 
   <!-- Modes -->
   <div class="mode-container">
-    <button class="mode-btn active" id="btnMemory" onclick="switchMode('memory')">🃏 Memory Flip</button>
-    <button class="mode-btn" id="btnListen" onclick="switchMode('listen')">🔊 Listen & Pop</button>
+    <button class="mode-btn active" id="btnListen" onclick="switchMode('listen')">🔊 Listen & Pop (Quiz)</button>
+    <button class="mode-btn" id="btnMemory" onclick="switchMode('memory')">🃏 Memory Flip</button>
   </div>
 
-  <!-- Difficulty Controls (Tick boxes) -->
+  <!-- Difficulty Controls -->
   <div class="toggles-container">
     <label class="toggle-label">
       <input type="checkbox" id="toggleEnglish" checked onchange="toggleDifficulty()">
@@ -306,6 +373,21 @@
     </label>
   </div>
 
+  <!-- 10 Questions Progress Indicator -->
+  <div class="score-lights-container">
+    <span class="q-label">Progress:</span>
+    <div class="bulb" id="bulb-0"></div>
+    <div class="bulb" id="bulb-1"></div>
+    <div class="bulb" id="bulb-2"></div>
+    <div class="bulb" id="bulb-3"></div>
+    <div class="bulb" id="bulb-4"></div>
+    <div class="bulb" id="bulb-5"></div>
+    <div class="bulb" id="bulb-6"></div>
+    <div class="bulb" id="bulb-7"></div>
+    <div class="bulb" id="bulb-8"></div>
+    <div class="bulb" id="bulb-9"></div>
+  </div>
+
   <!-- Audio Prompt for Listen Mode -->
   <div id="listenPromptBox">
     <div class="speaker-bubble" onclick="replayAudioPrompt()">
@@ -313,11 +395,18 @@
     </div>
   </div>
 
-  <!-- Grid -->
+  <!-- Cards Grid -->
   <div id="board"></div>
 
-  <!-- Win Banner -->
-  <div id="winBanner" class="win-modal">🎉 太棒了! (Well done, Aliza!) 🎉</div>
+  <!-- Results Modal -->
+  <div class="modal-overlay" id="resultsModal">
+    <div class="modal-card">
+      <div id="modalAnimBox"></div>
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-score" id="modalScoreText"></div>
+      <button class="modal-btn" id="modalActionBtn" onclick="resetRound()"></button>
+    </div>
+  </div>
 
   <script>
     const LESSONS = {
@@ -359,11 +448,16 @@
       }
     };
 
+    const TOTAL_QUESTIONS = 10;
     let currentTopic = 'colors';
-    let currentMode = 'memory';
-    let memoryFlipped = [];
-    let isBoardLocked = false;
+    let currentMode = 'listen'; // default to quiz mode for questions
+    let currentQuestionIndex = 0;
+    let correctCount = 0;
+    let hadMistakeOnCurrent = false;
+
     let targetWord = null;
+    let isBoardLocked = false;
+    let memoryFlipped = [];
 
     function speakWord(text) {
       if ('speechSynthesis' in window) {
@@ -379,7 +473,6 @@
     function toggleDifficulty() {
       const showEn = document.getElementById('toggleEnglish').checked;
       const showPic = document.getElementById('togglePictures').checked;
-      
       document.body.classList.toggle('hide-english', !showEn);
       document.body.classList.toggle('hide-pictures', !showPic);
     }
@@ -394,7 +487,7 @@
         btn.onclick = () => {
           currentTopic = key;
           renderTopicList();
-          initRound();
+          resetRound();
         };
         container.appendChild(btn);
       });
@@ -402,27 +495,107 @@
 
     function switchMode(mode) {
       currentMode = mode;
-      document.getElementById('btnMemory').classList.toggle('active', mode === 'memory');
       document.getElementById('btnListen').classList.toggle('active', mode === 'listen');
+      document.getElementById('btnMemory').classList.toggle('active', mode === 'memory');
       document.getElementById('listenPromptBox').style.display = mode === 'listen' ? 'block' : 'none';
-      initRound();
+      resetRound();
+    }
+
+    function updateBulbs() {
+      for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const bulb = document.getElementById(`bulb-${i}`);
+        bulb.classList.remove('current');
+        if (i === currentQuestionIndex && currentQuestionIndex < TOTAL_QUESTIONS) {
+          bulb.classList.add('current');
+        }
+      }
+    }
+
+    function resetBulbs() {
+      for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        const bulb = document.getElementById(`bulb-${i}`);
+        bulb.className = 'bulb';
+      }
+    }
+
+    function resetRound() {
+      document.getElementById('resultsModal').style.display = 'none';
+      currentQuestionIndex = 0;
+      correctCount = 0;
+      hadMistakeOnCurrent = false;
+      resetBulbs();
+      updateBulbs();
+      loadQuestion();
     }
 
     function shuffleArray(arr) {
       return arr.slice().sort(() => Math.random() - 0.5);
     }
 
-    function initRound() {
+    function loadQuestion() {
       const board = document.getElementById('board');
-      const winBanner = document.getElementById('winBanner');
       board.innerHTML = '';
-      winBanner.style.display = 'none';
-      memoryFlipped = [];
       isBoardLocked = false;
+      hadMistakeOnCurrent = false;
+      memoryFlipped = [];
+      updateBulbs();
 
       const words = LESSONS[currentTopic].items;
 
-      if (currentMode === 'memory') {
+      if (currentMode === 'listen') {
+        // Listen & Pop: Random target question
+        targetWord = words[Math.floor(Math.random() * words.length)];
+        setTimeout(() => speakWord(targetWord.hanzi), 350);
+
+        shuffleArray(words).forEach(item => {
+          const cardEl = document.createElement('div');
+          cardEl.className = 'card';
+          cardEl.innerHTML = `
+            <div class="card-icon">${item.icon}</div>
+            <div class="card-hanzi">${item.hanzi}</div>
+            <div class="card-english">${item.en}</div>
+          `;
+
+          cardEl.onclick = () => {
+            if (isBoardLocked) return;
+
+            if (item.hanzi === targetWord.hanzi) {
+              isBoardLocked = true;
+              cardEl.classList.add('matched');
+              speakWord("对了! " + item.hanzi);
+
+              // Update bulb
+              const bulb = document.getElementById(`bulb-${currentQuestionIndex}`);
+              if (!hadMistakeOnCurrent) {
+                bulb.classList.add('green');
+                correctCount++;
+              } else {
+                bulb.classList.add('red');
+              }
+
+              setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < TOTAL_QUESTIONS) {
+                  loadQuestion();
+                } else {
+                  finishSet();
+                }
+              }, 1000);
+
+            } else {
+              // Incorrect selection
+              hadMistakeOnCurrent = true;
+              speakWord("不对哦");
+              cardEl.style.borderColor = '#EF4444';
+              setTimeout(() => cardEl.style.borderColor = '#F3EDE4', 600);
+            }
+          };
+
+          board.appendChild(cardEl);
+        });
+
+      } else {
+        // Memory Flip (Round of 10 matches)
         let deck = [];
         words.forEach((item, id) => {
           deck.push({ id, kind: 'zh', data: item });
@@ -464,9 +637,25 @@
                   second.el.classList.add('matched');
                   memoryFlipped = [];
                   isBoardLocked = false;
-                  verifyVictory(words.length * 2);
+
+                  const bulb = document.getElementById(`bulb-${currentQuestionIndex}`);
+                  if (!hadMistakeOnCurrent) {
+                    bulb.classList.add('green');
+                    correctCount++;
+                  } else {
+                    bulb.classList.add('red');
+                  }
+
+                  currentQuestionIndex++;
+                  if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+                    finishSet();
+                  } else {
+                    hadMistakeOnCurrent = false;
+                    updateBulbs();
+                  }
                 }, 400);
               } else {
+                hadMistakeOnCurrent = true;
                 setTimeout(() => {
                   first.el.classList.add('backside');
                   second.el.classList.add('backside');
@@ -481,37 +670,6 @@
 
           board.appendChild(cardEl);
         });
-
-      } else {
-        targetWord = words[Math.floor(Math.random() * words.length)];
-        setTimeout(() => speakWord(targetWord.hanzi), 350);
-
-        shuffleArray(words).forEach(item => {
-          const cardEl = document.createElement('div');
-          cardEl.className = 'card';
-          cardEl.innerHTML = `
-            <div class="card-icon">${item.icon}</div>
-            <div class="card-hanzi">${item.hanzi}</div>
-            <div class="card-english">${item.en}</div>
-          `;
-
-          cardEl.onclick = () => {
-            if (item.hanzi === targetWord.hanzi) {
-              cardEl.classList.add('matched');
-              speakWord("对了! " + item.hanzi);
-              setTimeout(() => {
-                winBanner.style.display = 'block';
-                setTimeout(initRound, 1400);
-              }, 400);
-            } else {
-              speakWord("不对哦");
-              cardEl.style.borderColor = '#EF4444';
-              setTimeout(() => cardEl.style.borderColor = '#F3EDE4', 600);
-            }
-          };
-
-          board.appendChild(cardEl);
-        });
       }
     }
 
@@ -519,15 +677,59 @@
       if (targetWord) speakWord(targetWord.hanzi);
     }
 
-    function verifyVictory(expectedTotal) {
-      const matched = document.querySelectorAll('.card.matched').length;
-      if (matched === expectedTotal) {
-        document.getElementById('winBanner').style.display = 'block';
+    function finishSet() {
+      const modal = document.getElementById('resultsModal');
+      const animBox = document.getElementById('modalAnimBox');
+      const title = document.getElementById('modalTitle');
+      const scoreText = document.getElementById('modalScoreText');
+      const btn = document.getElementById('modalActionBtn');
+
+      modal.style.display = 'flex';
+
+      if (correctCount >= 8) {
+        // SUCCESS (>= 8/10): Dancing Panda + Confetti Blast
+        animBox.innerHTML = '<div class="panda-dancer">🐼</div>';
+        title.innerHTML = '太棒了! Fantastic Job! 🎉';
+        title.style.color = '#059669';
+        scoreText.innerHTML = `Aliza scored <b>${correctCount} / 10</b> on first try!`;
+        btn.innerText = 'Play Again 🌸';
+        btn.style.background = '#10B981';
+
+        speakWord("太棒了, Aliza! 你真棒!");
+        fireConfettiCannon();
+      } else {
+        // RETRY (< 8/10): Encouragement to start again
+        animBox.innerHTML = '<div style="font-size: 70px; margin-bottom: 8px;">🐼💪</div>';
+        title.innerHTML = "Good Try! Let's Practice!";
+        title.style.color = '#D97706';
+        scoreText.innerHTML = `You scored <b>${correctCount} / 10</b>.<br>Let's aim for 8 or more!`;
+        btn.innerText = 'Try Again 🔄';
+        btn.style.background = '#FF5A79';
+
+        speakWord("加油! 我们再试一次吧!");
       }
     }
 
+    function fireConfettiCannon() {
+      const count = 200;
+      const defaults = { origin: { y: 0.7 } };
+
+      function fire(particleRatio, opts) {
+        confetti(Object.assign({}, defaults, opts, {
+          particleCount: Math.floor(count * particleRatio)
+        }));
+      }
+
+      fire(0.25, { spread: 26, startVelocity: 55 });
+      fire(0.2, { spread: 60 });
+      fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+      fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+      fire(0.1, { spread: 120, startVelocity: 45 });
+    }
+
+    // Launch
     renderTopicList();
-    initRound();
+    resetRound();
     toggleDifficulty();
   </script>
 </body>
