@@ -1,736 +1,727 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aliza's Mandarin Playground</title>
-  <!-- Confetti library for smooth celebration animation -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #FFF7EA 0%, #FFEBF0 100%);
-      --card-bg: #FFFFFF;
-      --primary: #FF5A79;
-      --primary-light: #FFE4E8;
-      --secondary: #3B82F6;
-      --secondary-light: #EBF5FF;
-      --success: #10B981;
-      --success-light: #ECFDF5;
-      --danger: #EF4444;
-      --border-color: #F1E5D8;
-      --text-dark: #1F2937;
-      --text-sub: #6B7280;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mandarin Playroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --paper:#F0F7FF;
+    --surface:#FFFFFF;
+    --ink:#1F2A44;
+    --ink-soft:#5B6889;
+    --coral:#FF6B5B;
+    --sun:#FFC145;
+    --bamboo:#2FBF8F;
+    --sky:#4C8DFF;
+    --purple:#A78BFA;
+    --shadow: 31,42,68;
+    --card-back-a:#DCEBFF;
+    --card-back-b:#C7DEFF;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0F1830;
+      --surface:#182448;
+      --ink:#EEF3FF;
+      --ink-soft:#9FAFD4;
+      --coral:#FF8A7C;
+      --sun:#FFD873;
+      --bamboo:#4CE0B3;
+      --sky:#7AAEFF;
+      --purple:#C6B7FF;
+      --shadow: 3,6,16;
+      --card-back-a:#233363;
+      --card-back-b:#1B2850;
     }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0F1830;
+    --surface:#182448;
+    --ink:#EEF3FF;
+    --ink-soft:#9FAFD4;
+    --coral:#FF8A7C;
+    --sun:#FFD873;
+    --bamboo:#4CE0B3;
+    --sky:#7AAEFF;
+    --purple:#C6B7FF;
+    --shadow: 3,6,16;
+    --card-back-a:#233363;
+    --card-back-b:#1B2850;
+  }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Quicksand', system-ui, sans-serif;
+    padding:20px 16px 48px;
+    min-height:100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,h2,h3{ font-family:'Baloo 2', 'Quicksand', system-ui, sans-serif; text-wrap:balance; margin:0; }
+  .hanzi{ font-family:'Noto Sans SC','Baloo 2',sans-serif; }
+  button{ font-family:inherit; }
+  a{ color:inherit; }
+  .swatch{ border:3px solid rgba(120,130,150,.28); }
 
-    body {
-      margin: 0;
-      padding: 14px 12px;
-      min-height: 100vh;
-      background: var(--bg-gradient);
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif;
-      color: var(--text-dark);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-x: hidden;
-    }
+  .wrap{ max-width:860px; margin:0 auto; }
 
-    header {
-      text-align: center;
-      margin-bottom: 8px;
-    }
+  /* ---------- header ---------- */
+  .top{
+    display:flex; align-items:center; gap:14px; margin-bottom:22px; flex-wrap:wrap;
+  }
+  .panda{ width:56px; height:56px; flex:none; filter: drop-shadow(0 3px 6px rgba(var(--shadow),0.15)); }
+  .top h1{ font-size:clamp(24px,5vw,32px); color:var(--ink); }
+  .top .tag{ color:var(--ink-soft); font-size:15px; font-weight:600; margin-top:2px; }
+  .top-spacer{ flex:1; }
+  .back-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface); color:var(--ink); border:none;
+    padding:10px 16px; border-radius:999px; font-weight:700; font-size:15px;
+    cursor:pointer; box-shadow:0 4px 0 rgba(var(--shadow),0.1);
+    transition:transform .12s ease;
+  }
+  .back-btn:hover{ transform:translateY(-1px); }
+  .back-btn:active{ transform:translateY(1px); }
+  .back-btn:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+    outline:3px solid var(--sky); outline-offset:2px;
+  }
 
-    h1 {
-      margin: 0;
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--primary);
-      text-shadow: 0 2px 4px rgba(255, 90, 121, 0.15);
-    }
+  /* ---------- home: subject tiles ---------- */
+  .tiles{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px;
+  }
+  .tile{
+    --accent: var(--sky);
+    background:var(--surface);
+    border-radius:28px;
+    padding:22px 20px 20px;
+    text-align:left;
+    border:none;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 10px 0 rgba(var(--shadow),0.08), 0 2px 14px rgba(var(--shadow),0.10);
+    transition:transform .15s ease, box-shadow .15s ease;
+    display:flex; flex-direction:column; gap:10px;
+    color:var(--ink);
+  }
+  .tile:hover{ transform:translateY(-4px); }
+  .tile:active{ transform:translateY(1px); box-shadow:0 4px 0 rgba(var(--shadow),0.08); }
+  .tile::before{
+    content:""; position:absolute; inset:0 auto auto 0; width:100%; height:8px;
+    background:var(--accent);
+  }
+  .tile .icon{
+    font-size:38px; width:64px; height:64px; border-radius:20px;
+    background:color-mix(in srgb, var(--accent) 18%, transparent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tile h2{ font-size:21px; }
+  .tile .preview{ font-size:22px; letter-spacing:2px; opacity:.9; }
+  .tile .stars{ margin-top:auto; display:flex; gap:8px; font-size:14px; color:var(--ink-soft); font-weight:700; }
+  .tile .stars span{ display:inline-flex; align-items:center; gap:4px; }
+  .tile .stars .done{ color:var(--accent); }
 
-    /* Category Topics */
-    .topics-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      max-width: 650px;
-    }
+  .intro-line{ color:var(--ink-soft); font-size:16px; font-weight:600; margin:2px 0 20px; }
 
-    .topic-pill {
-      background: #FFFFFF;
-      border: 2px solid var(--border-color);
-      border-radius: 25px;
-      padding: 6px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-dark);
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-      transition: all 0.2s ease;
-    }
+  /* ---------- subject hub ---------- */
+  .subject-head{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .subject-head .icon-badge{
+    --accent: var(--sky);
+    width:52px; height:52px; border-radius:16px; font-size:28px;
+    background:color-mix(in srgb, var(--accent) 20%, transparent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .subject-head h2{ font-size:26px; }
 
-    .topic-pill:active { transform: scale(0.95); }
+  .word-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px; margin-bottom:24px;
+  }
+  .word-card{
+    background:var(--surface); border-radius:20px; padding:14px 10px 12px; text-align:center;
+    border:none; cursor:pointer; box-shadow:0 3px 10px rgba(var(--shadow),0.08);
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    transition:transform .12s ease;
+  }
+  .word-card:hover{ transform:translateY(-2px); }
+  .word-card:active{ transform:scale(.97); }
+  .word-card .visual{ font-size:34px; line-height:1; margin-bottom:2px; }
+  .word-card .swatch{ width:38px; height:38px; border-radius:50%; margin-bottom:2px; box-shadow: inset 0 -4px 8px rgba(0,0,0,.12); }
+  .word-card .hanzi{ font-size:22px; font-weight:700; }
+  .word-card .pinyin{ font-size:13px; color:var(--ink-soft); font-weight:600; }
+  .word-card .en{ font-size:12px; color:var(--ink-soft); }
+  .word-card .speak-note{ font-size:16px; margin-top:2px; }
 
-    .topic-pill.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #FFFFFF;
-      box-shadow: 0 4px 10px rgba(255, 90, 121, 0.35);
-      transform: scale(1.03);
-    }
+  .mode-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .mode-btn{
+    --accent: var(--coral);
+    border:none; border-radius:24px; cursor:pointer; text-align:left;
+    padding:20px 22px; color:#fff;
+    background:linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #000 12%));
+    box-shadow:0 10px 0 color-mix(in srgb, var(--accent) 55%, #000 25%);
+    display:flex; flex-direction:column; gap:6px;
+    transition:transform .12s ease;
+  }
+  .mode-btn:hover{ transform:translateY(-3px); }
+  .mode-btn:active{ transform:translateY(2px); box-shadow:0 5px 0 color-mix(in srgb, var(--accent) 55%, #000 25%); }
+  .mode-btn .emo{ font-size:32px; }
+  .mode-btn .title{ font-size:20px; font-weight:800; font-family:'Baloo 2',sans-serif; }
+  .mode-btn .desc{ font-size:14px; opacity:.92; font-weight:600; }
 
-    /* Mode Switcher */
-    .mode-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+  /* ---------- match-up game ---------- */
+  .progress-dots{ display:flex; gap:8px; margin:6px 0 20px; flex-wrap:wrap; }
+  .progress-dots .dot{ width:14px; height:14px; border-radius:50%; background:color-mix(in srgb, var(--ink-soft) 30%, transparent); }
+  .progress-dots .dot.done{ background:var(--bamboo); }
+  .progress-dots .dot.current{ outline:3px solid var(--sky); outline-offset:2px; }
 
-    .mode-btn {
-      background: #FFFFFF;
-      border: 2px solid var(--secondary-light);
-      color: var(--secondary);
-      font-size: 14px;
-      font-weight: 800;
-      padding: 6px 16px;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+  .prompt-card{
+    background:var(--surface); border-radius:28px; padding:34px 20px; text-align:center; margin-bottom:26px;
+    box-shadow:0 3px 16px rgba(var(--shadow),0.10);
+    cursor:pointer; border:none; width:100%; color:var(--ink);
+  }
+  .prompt-card .hanzi{ font-size:64px; font-weight:700; line-height:1; }
+  .prompt-card .pinyin{ font-size:22px; color:var(--ink-soft); font-weight:700; margin-top:6px; }
+  .prompt-card .tap-hint{ font-size:14px; color:var(--ink-soft); margin-top:10px; font-weight:600; }
 
-    .mode-btn.active {
-      background: var(--secondary);
-      border-color: var(--secondary);
-      color: #FFFFFF;
-      box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
-    }
+  .choice-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:16px; }
+  .choice-tile{
+    background:var(--surface); border:4px solid transparent; border-radius:22px; padding:20px 10px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    box-shadow:0 3px 10px rgba(var(--shadow),0.08);
+    transition:transform .1s ease, border-color .15s ease;
+    aspect-ratio:1/1;
+  }
+  .choice-tile .visual{ font-size:44px; }
+  .choice-tile .swatch{ width:48px; height:48px; border-radius:50%; box-shadow: inset 0 -5px 10px rgba(0,0,0,.14); }
+  .choice-tile:hover{ transform:translateY(-2px); }
+  .choice-tile.correct{ border-color:var(--bamboo); animation: pop .5s ease; }
+  .choice-tile.wrong{ animation: shake .4s ease; border-color:var(--coral); }
 
-    /* Difficulty Toggles */
-    .toggles-container {
-      display: flex;
-      gap: 16px;
-      background: rgba(255, 255, 255, 0.85);
-      padding: 6px 16px;
-      border-radius: 20px;
-      border: 1.5px solid #F0E3D5;
-      margin-bottom: 12px;
-    }
+  @keyframes pop{ 0%{transform:scale(1);} 40%{transform:scale(1.12);} 100%{transform:scale(1);} }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
 
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #4B5563;
-      cursor: pointer;
-    }
+  /* ---------- memory game ---------- */
+  .memory-grid{ display:grid; gap:12px; grid-template-columns:repeat(var(--cols,4), 1fr); }
+  .flip-card{ perspective:800px; aspect-ratio:1/1; }
+  .flip-card button{
+    width:100%; height:100%; border:none; background:none; cursor:pointer; padding:0;
+    position:relative; transform-style:preserve-3d; transition:transform .45s cubic-bezier(.2,.9,.3,1.1);
+  }
+  .flip-card.is-open button, .flip-card.is-matched button{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:16px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2px;
+    box-shadow:0 3px 10px rgba(var(--shadow),0.10);
+  }
+  .flip-front{
+    background:repeating-linear-gradient(135deg, var(--card-back-a) 0 14px, var(--card-back-b) 14px 28px);
+    font-size:26px;
+  }
+  .flip-back{ background:var(--surface); transform:rotateY(180deg); padding:6px; text-align:center; }
+  .flip-back .visual{ font-size:clamp(22px,6vw,36px); }
+  .flip-back .swatch{ width:60%; aspect-ratio:1/1; border-radius:50%; box-shadow: inset 0 -5px 10px rgba(0,0,0,.14); }
+  .flip-back .hanzi{ font-size:clamp(16px,4vw,24px); font-weight:700; }
+  .flip-back .pinyin{ font-size:clamp(9px,2.4vw,12px); color:var(--ink-soft); font-weight:700; }
+  .flip-card.is-matched .flip-back{ background:color-mix(in srgb, var(--bamboo) 22%, var(--surface)); }
 
-    .toggle-label input[type="checkbox"] {
-      width: 17px;
-      height: 17px;
-      accent-color: var(--primary);
-      cursor: pointer;
-    }
+  .stat-row{ display:flex; gap:18px; margin-bottom:18px; flex-wrap:wrap; font-weight:700; color:var(--ink-soft); }
+  .stat-row b{ color:var(--ink); }
 
-    /* 10 Questions Light Bulb Indicator */
-    .score-lights-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #FFFFFF;
-      padding: 8px 16px;
-      border-radius: 30px;
-      border: 2px solid #E5E7EB;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-      margin-bottom: 14px;
-    }
+  /* ---------- completion overlay ---------- */
+  .celebrate{
+    background:var(--surface); border-radius:28px; padding:36px 26px; text-align:center;
+    box-shadow:0 8px 30px rgba(var(--shadow),0.16); max-width:420px; margin:20px auto 0;
+  }
+  .celebrate .big-emoji{ font-size:56px; margin-bottom:6px; }
+  .celebrate h2{ font-size:24px; margin-bottom:6px; }
+  .celebrate p{ color:var(--ink-soft); font-weight:600; margin:0 0 20px; }
+  .celebrate .stars-row{ font-size:34px; margin-bottom:22px; letter-spacing:4px; }
+  .celebrate .btn-col{ display:flex; flex-direction:column; gap:10px; }
+  .celebrate .btn{
+    border:none; border-radius:16px; padding:14px; font-weight:800; font-size:15px; cursor:pointer;
+    font-family:'Baloo 2',sans-serif;
+  }
+  .celebrate .btn.primary{ background:var(--bamboo); color:#0b3327; }
+  .celebrate .btn.secondary{ background:color-mix(in srgb, var(--sky) 18%, transparent); color:var(--ink); }
 
-    .q-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text-sub);
-      margin-right: 2px;
-    }
+  footer{ text-align:center; color:var(--ink-soft); font-size:13px; font-weight:600; margin-top:40px; }
 
-    .bulb {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #E5E7EB;
-      border: 2px solid #D1D5DB;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
 
-    .bulb.current {
-      border-color: var(--primary);
-      box-shadow: 0 0 6px var(--primary);
-      transform: scale(1.15);
-    }
-
-    .bulb.green {
-      background: #10B981;
-      border-color: #059669;
-      box-shadow: 0 0 8px #10B981;
-    }
-
-    .bulb.red {
-      background: #EF4444;
-      border-color: #DC2626;
-      box-shadow: 0 0 8px #EF4444;
-    }
-
-    /* Prompt Box for Listen Mode */
-    #listenPromptBox {
-      display: none;
-      margin-bottom: 14px;
-    }
-
-    .speaker-bubble {
-      background: var(--primary-light);
-      border: 2px dashed var(--primary);
-      color: var(--primary);
-      padding: 10px 22px;
-      border-radius: 30px;
-      font-size: 18px;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      animation: pulse 1.8s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.03); }
-    }
-
-    /* Cards Grid */
-    #board {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      width: 100%;
-      max-width: 620px;
-      margin-bottom: 16px;
-    }
-
-    @media (max-width: 480px) {
-      #board { gap: 8px; }
-    }
-
-    .card {
-      aspect-ratio: 1 / 1.15;
-      background: var(--card-bg);
-      border-radius: 20px;
-      border: 3px solid #F3EDE4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
-      position: relative;
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease;
-      padding: 6px;
-      text-align: center;
-    }
-
-    .card:active { transform: scale(0.94); }
-
-    .card.backside {
-      background: linear-gradient(135deg, #FFB2C3 0%, #FF7F9B 100%);
-      border-color: #FFA5BA;
-    }
-
-    .card.backside::after {
-      content: "🌸";
-      font-size: 32px;
-    }
-
-    .card.matched {
-      background: var(--success-light);
-      border-color: var(--success);
-      transform: scale(0.96);
-      pointer-events: none;
-      opacity: 0.9;
-    }
-
-    /* Card Details */
-    .card-icon { font-size: 34px; line-height: 1; margin-bottom: 4px; }
-    .card-hanzi { font-size: 30px; font-weight: 800; color: var(--text-dark); line-height: 1.15; }
-    .card-pinyin { font-size: 14px; font-weight: 600; color: var(--text-sub); margin-top: 3px; }
-    .card-english { font-size: 13px; font-weight: 700; color: #4B5563; margin-top: 2px; }
-
-    body.hide-english .card-english { display: none !important; }
-    body.hide-pictures .card-icon { display: none !important; }
-
-    /* End of 10-Question Round Modal Overlay */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .modal-card {
-      background: #FFFFFF;
-      border-radius: 30px;
-      padding: 28px 24px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.6); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Dancing Panda Animation */
-    .panda-dancer {
-      font-size: 80px;
-      display: inline-block;
-      margin-bottom: 8px;
-      animation: pandaDance 0.7s infinite alternate ease-in-out;
-    }
-
-    @keyframes pandaDance {
-      0% { transform: rotate(-12deg) translateY(0) scale(1); }
-      50% { transform: rotate(0deg) translateY(-14px) scale(1.08); }
-      100% { transform: rotate(12deg) translateY(0) scale(1); }
-    }
-
-    .modal-title {
-      font-size: 24px;
-      font-weight: 800;
-      margin: 0 0 6px 0;
-    }
-
-    .modal-score {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-sub);
-      margin-bottom: 18px;
-    }
-
-    .modal-btn {
-      background: var(--primary);
-      color: #FFFFFF;
-      border: none;
-      border-radius: 20px;
-      padding: 12px 28px;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(255, 90, 121, 0.4);
-      transition: transform 0.15s ease;
-    }
-    .modal-btn:active { transform: scale(0.95); }
-  </style>
+  @media (max-width:480px){
+    .choice-grid{ grid-template-columns:repeat(2,1fr); }
+    .memory-grid{ --cols:3 !important; }
+  }
+</style>
 </head>
 <body>
+<div class="wrap" id="app"></div>
 
-  <header>
-    <h1>🌸 Aliza's Mandarin Playground</h1>
-  </header>
+<script>
+(function(){
+  "use strict";
 
-  <!-- Categories -->
-  <div class="topics-container" id="topicList"></div>
+  /* ============ VOCABULARY DATA ============
+     Add new subjects or words here (or ask Claude to add them from a class PDF, then re-export this file).
+     Each word needs: en, hanzi, pinyin, and either `emoji` (a picture) or `swatch` (a hex color, for color words).
+  */
+  var SUBJECTS = [
+    {
+      id: 'animals', name: 'Animals', icon: '🐾', accent: 'bamboo',
+      words: [
+        { en:'Dog', hanzi:'狗', pinyin:'gǒu', emoji:'🐶' },
+        { en:'Cat', hanzi:'猫', pinyin:'māo', emoji:'🐱' },
+        { en:'Bird', hanzi:'鸟', pinyin:'niǎo', emoji:'🐦' },
+        { en:'Fish', hanzi:'鱼', pinyin:'yú', emoji:'🐟' },
+        { en:'Rabbit', hanzi:'兔子', pinyin:'tùzi', emoji:'🐰' },
+        { en:'Panda', hanzi:'熊猫', pinyin:'xióngmāo', emoji:'🐼' }
+      ]
+    },
+    {
+      id: 'colors', name: 'Colors', icon: '🎨', accent: 'sky',
+      words: [
+        { en:'Red', hanzi:'红色', pinyin:'hóngsè', swatch:'#FF6B5B' },
+        { en:'Yellow', hanzi:'黄色', pinyin:'huángsè', swatch:'#FFC145' },
+        { en:'Blue', hanzi:'蓝色', pinyin:'lánsè', swatch:'#4C8DFF' },
+        { en:'Green', hanzi:'绿色', pinyin:'lǜsè', swatch:'#2FBF8F' },
+        { en:'Pink', hanzi:'粉色', pinyin:'fěnsè', swatch:'#FF8FB3' },
+        { en:'Purple', hanzi:'紫色', pinyin:'zǐsè', swatch:'#A78BFA' },
+        { en:'Black', hanzi:'黑色', pinyin:'hēisè', swatch:'#2B2B33' },
+        { en:'White', hanzi:'白色', pinyin:'báisè', swatch:'#FFFFFF' }
+      ]
+    },
+    {
+      id: 'fruits', name: 'Fruits', icon: '🍎', accent: 'coral',
+      words: [
+        { en:'Apple', hanzi:'苹果', pinyin:'píngguǒ', emoji:'🍎' },
+        { en:'Banana', hanzi:'香蕉', pinyin:'xiāngjiāo', emoji:'🍌' },
+        { en:'Grapes', hanzi:'葡萄', pinyin:'pútáo', emoji:'🍇' },
+        { en:'Strawberry', hanzi:'草莓', pinyin:'cǎoméi', emoji:'🍓' },
+        { en:'Peach', hanzi:'桃子', pinyin:'táozi', emoji:'🍑' },
+        { en:'Orange', hanzi:'橙子', pinyin:'chéngzi', emoji:'🍊' },
+        { en:'Watermelon', hanzi:'西瓜', pinyin:'xīguā', emoji:'🍉' },
+        { en:'Blueberry', hanzi:'蓝莓', pinyin:'lánméi', emoji:'🫐' }
+      ]
+    },
+    {
+      id: 'family', name: 'Family', icon: '👪', accent: 'purple',
+      words: [
+        { en:'Grandpa', hanzi:'爷爷', pinyin:'yéye', emoji:'👴' },
+        { en:'Grandma', hanzi:'奶奶', pinyin:'nǎinai', emoji:'👵' },
+        { en:'Dad', hanzi:'爸爸', pinyin:'bàba', emoji:'👨' },
+        { en:'Mom', hanzi:'妈妈', pinyin:'māma', emoji:'👩' },
+        { en:'Older brother', hanzi:'哥哥', pinyin:'gēge', emoji:'👦' },
+        { en:'Older sister', hanzi:'姐姐', pinyin:'jiějie', emoji:'👧' },
+        { en:'Younger brother', hanzi:'弟弟', pinyin:'dìdi', emoji:'🧒' },
+        { en:'Younger sister', hanzi:'妹妹', pinyin:'mèimei', emoji:'👶' }
+      ]
+    }
+  ];
 
-  <!-- Modes -->
-  <div class="mode-container">
-    <button class="mode-btn active" id="btnListen" onclick="switchMode('listen')">🔊 Listen & Pop (Quiz)</button>
-    <button class="mode-btn" id="btnMemory" onclick="switchMode('memory')">🃏 Memory Flip</button>
-  </div>
+  /* ============ small helpers ============ */
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  /* ---- short feedback chimes (synthesized, no audio files needed) ---- */
+  var audioCtx = null;
+  function getAudioCtx(){
+    try{
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }catch(e){ return null; }
+  }
+  function tone(ctx, freq, startTime, duration, gainPeak){
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(gainPeak || 0.22, startTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.02);
+  }
+  function playCorrectSound(){
+    var ctx = getAudioCtx(); if (!ctx) return;
+    try{
+      var t = ctx.currentTime;
+      tone(ctx, 523.25, t, 0.14);        // C5
+      tone(ctx, 783.99, t + 0.11, 0.20); // G5 — a bright little "ta-da"
+    }catch(e){ /* ignore */ }
+  }
+  function playWrongSound(){
+    var ctx = getAudioCtx(); if (!ctx) return;
+    try{
+      var t = ctx.currentTime;
+      tone(ctx, 233, t, 0.16, 0.18);      // low, gentle "try again" buzz
+      tone(ctx, 196, t + 0.09, 0.22, 0.16);
+    }catch(e){ /* ignore */ }
+  }
 
-  <!-- Difficulty Controls -->
-  <div class="toggles-container">
-    <label class="toggle-label">
-      <input type="checkbox" id="toggleEnglish" checked onchange="toggleDifficulty()">
-      <span>Show English</span>
-    </label>
-    <label class="toggle-label">
-      <input type="checkbox" id="togglePictures" checked onchange="toggleDifficulty()">
-      <span>Show Pictures</span>
-    </label>
-  </div>
+  function speak(text, lang){
+    try{
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = lang;
+      u.rate = 0.9;
+      window.speechSynthesis.speak(u);
+    }catch(e){ /* speech not available — fail silently */ }
+  }
+  function findSubject(id){
+    for (var i=0;i<SUBJECTS.length;i++) if (SUBJECTS[i].id === id) return SUBJECTS[i];
+    return null;
+  }
+  function visualHtml(word, size){
+    if (word.swatch){
+      return '<span class="swatch" style="background:'+word.swatch+'; width:'+(size||38)+'px; height:'+(size||38)+'px;"></span>';
+    }
+    return '<span class="visual">'+word.emoji+'</span>';
+  }
 
-  <!-- 10 Questions Progress Indicator -->
-  <div class="score-lights-container">
-    <span class="q-label">Progress:</span>
-    <div class="bulb" id="bulb-0"></div>
-    <div class="bulb" id="bulb-1"></div>
-    <div class="bulb" id="bulb-2"></div>
-    <div class="bulb" id="bulb-3"></div>
-    <div class="bulb" id="bulb-4"></div>
-    <div class="bulb" id="bulb-5"></div>
-    <div class="bulb" id="bulb-6"></div>
-    <div class="bulb" id="bulb-7"></div>
-    <div class="bulb" id="bulb-8"></div>
-    <div class="bulb" id="bulb-9"></div>
-  </div>
+  /* ============ progress (per-device, local only) ============ */
+  var PROGRESS_KEY = 'mandarin-playroom-progress-v1';
+  function loadProgress(){
+    try{
+      var raw = window.localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function saveProgress(p){
+    try{ window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }catch(e){ /* ignore */ }
+  }
+  function markDone(subjectId, mode){
+    var p = loadProgress();
+    p[subjectId] = p[subjectId] || {};
+    p[subjectId][mode] = true;
+    saveProgress(p);
+  }
 
-  <!-- Audio Prompt for Listen Mode -->
-  <div id="listenPromptBox">
-    <div class="speaker-bubble" onclick="replayAudioPrompt()">
-      <span>🔊 Tap to hear word again</span>
-    </div>
-  </div>
+  /* ============ state ============ */
+  var STATE = { view:'home', subjectId:null };
 
-  <!-- Cards Grid -->
-  <div id="board"></div>
+  function go(view, subjectId){
+    STATE = { view:view, subjectId: subjectId || null };
+    renderApp();
+    window.scrollTo(0,0);
+  }
 
-  <!-- Results Modal -->
-  <div class="modal-overlay" id="resultsModal">
-    <div class="modal-card">
-      <div id="modalAnimBox"></div>
-      <h2 class="modal-title" id="modalTitle"></h2>
-      <div class="modal-score" id="modalScoreText"></div>
-      <button class="modal-btn" id="modalActionBtn" onclick="resetRound()"></button>
-    </div>
-  </div>
+  /* ============ mascot ============ */
+  var PANDA_SVG = '<svg class="panda" viewBox="0 0 64 64" aria-hidden="true">'+
+    '<circle cx="32" cy="36" r="22" fill="#fff"/>'+
+    '<circle cx="14" cy="16" r="9" fill="#2b2b33"/><circle cx="50" cy="16" r="9" fill="#2b2b33"/>'+
+    '<circle cx="16" cy="18" r="4.5" fill="#fff"/><circle cx="48" cy="18" r="4.5" fill="#fff"/>'+
+    '<ellipse cx="21" cy="34" rx="7" ry="9" fill="#2b2b33"/><ellipse cx="43" cy="34" rx="7" ry="9" fill="#2b2b33"/>'+
+    '<circle cx="32" cy="42" r="4" fill="#2b2b33"/>'+
+    '<path d="M26 47 Q32 52 38 47" stroke="#2b2b33" stroke-width="2" fill="none" stroke-linecap="round"/>'+
+    '</svg>';
 
-  <script>
-    const LESSONS = {
-      colors: {
-        title: "🎨 Colors (颜色)",
-        items: [
-          { hanzi: "绿色", pinyin: "lǜ sè", en: "Green colour", icon: "🟢" },
-          { hanzi: "红色", pinyin: "hóng sè", en: "Red colour", icon: "🔴" },
-          { hanzi: "蓝色", pinyin: "lán sè", en: "Blue colour", icon: "🔵" },
-          { hanzi: "黄色", pinyin: "huáng sè", en: "Yellow colour", icon: "🟡" }
-        ]
-      },
-      animals: {
-        title: "🐶 Animals (动物)",
-        items: [
-          { hanzi: "狗", pinyin: "gǒu", en: "Dog", icon: "🐶" },
-          { hanzi: "猫", pinyin: "māo", en: "Cat", icon: "🐱" },
-          { hanzi: "兔子", pinyin: "tù zi", en: "Rabbit", icon: "🐰" },
-          { hanzi: "鸟", pinyin: "niǎo", en: "Bird", icon: "🐦" }
-        ]
-      },
-      fruits: {
-        title: "🍎 Fruits (水果)",
-        items: [
-          { hanzi: "苹果", pinyin: "píng guǒ", en: "Apple", icon: "🍎" },
-          { hanzi: "香蕉", pinyin: "xiāng jiāo", en: "Banana", icon: "🍌" },
-          { hanzi: "西瓜", pinyin: "xī guā", en: "Watermelon", icon: "🍉" },
-          { hanzi: "草莓", pinyin: "cǎo méi", en: "Strawberry", icon: "🍓" }
-        ]
-      },
-      numbers: {
-        title: "🔢 Numbers (数字)",
-        items: [
-          { hanzi: "一", pinyin: "yī", en: "One (1)", icon: "1️⃣" },
-          { hanzi: "二", pinyin: "èr", en: "Two (2)", icon: "2️⃣" },
-          { hanzi: "三", pinyin: "sān", en: "Three (3)", icon: "3️⃣" },
-          { hanzi: "四", pinyin: "sì", en: "Four (4)", icon: "4️⃣" }
-        ]
-      }
-    };
+  /* ============ HOME ============ */
+  function renderHome(){
+    var progress = loadProgress();
+    var tiles = SUBJECTS.map(function(s){
+      var done = progress[s.id] || {};
+      var preview = s.words.slice(0,4).map(function(w){ return w.emoji || ''; }).filter(Boolean).join(' ');
+      return (
+        '<button class="tile" data-subject="'+s.id+'" style="--accent:var(--'+s.accent+')">'+
+          '<span class="icon">'+s.icon+'</span>'+
+          '<h2>'+escapeHtml(s.name)+'</h2>'+
+          (preview ? '<div class="preview">'+preview+'</div>' : '<div class="preview">'+s.words.slice(0,6).map(function(w){return '<span class="swatch" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:'+w.swatch+';margin-right:4px;vertical-align:middle;"></span>';}).join('')+'</div>')+
+          '<div class="stars">'+
+            '<span class="'+(done.match?'done':'')+'">'+(done.match?'⭐':'☆')+' Match-Up</span>'+
+            '<span class="'+(done.memory?'done':'')+'">'+(done.memory?'⭐':'☆')+' Memory</span>'+
+          '</div>'+
+        '</button>'
+      );
+    }).join('');
 
-    const TOTAL_QUESTIONS = 10;
-    let currentTopic = 'colors';
-    let currentMode = 'listen'; // default to quiz mode for questions
-    let currentQuestionIndex = 0;
-    let correctCount = 0;
-    let hadMistakeOnCurrent = false;
+    $('#app').innerHTML =
+      '<div class="top">'+PANDA_SVG+
+        '<div><h1>Mandarin Playroom</h1><div class="tag">Learn Chinese words through play</div></div>'+
+      '</div>'+
+      '<div class="intro-line">Pick a subject to start playing!</div>'+
+      '<div class="tiles">'+tiles+'</div>'+
+      '<footer>Made with ❤️ for a curious 4-year-old learning Mandarin, one game at a time.</footer>';
 
-    let targetWord = null;
-    let isBoardLocked = false;
-    let memoryFlipped = [];
+    $all('.tile', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){ go('subject', btn.getAttribute('data-subject')); });
+    });
+  }
 
-    function speakWord(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'zh-CN';
-        utterance.rate = 0.8;
-        utterance.pitch = 1.1;
-        window.speechSynthesis.speak(utterance);
-      }
+  /* ============ SUBJECT HUB ============ */
+  function renderSubject(id){
+    var s = findSubject(id);
+    if (!s){ go('home'); return; }
+    var cards = s.words.map(function(w){
+      return (
+        '<button class="word-card" data-hanzi="'+escapeHtml(w.hanzi)+'">'+
+          visualHtml(w, 38)+
+          '<span class="hanzi">'+escapeHtml(w.hanzi)+'</span>'+
+          '<span class="pinyin">'+escapeHtml(w.pinyin)+'</span>'+
+          '<span class="en">'+escapeHtml(w.en)+'</span>'+
+          '<span class="speak-note">🔊</span>'+
+        '</button>'
+      );
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top">'+
+        '<button class="back-btn">← Playroom</button>'+
+        '<div class="top-spacer"></div>'+
+      '</div>'+
+      '<div class="subject-head">'+
+        '<span class="icon-badge" style="--accent:var(--'+s.accent+')">'+s.icon+'</span>'+
+        '<h2>'+escapeHtml(s.name)+'</h2>'+
+      '</div>'+
+      '<div class="intro-line">Tap a word to hear it, then try a game.</div>'+
+      '<div class="word-grid">'+cards+'</div>'+
+      '<div class="mode-row">'+
+        '<button class="mode-btn" data-mode="match" style="--accent:var(--coral)">'+
+          '<span class="emo">🧩</span><span class="title">Match-Up</span>'+
+          '<span class="desc">Hear a word, tap the matching picture</span>'+
+        '</button>'+
+        '<button class="mode-btn" data-mode="memory" style="--accent:var(--purple)">'+
+          '<span class="emo">🃏</span><span class="title">Memory</span>'+
+          '<span class="desc">Flip cards to find the matching pairs</span>'+
+        '</button>'+
+      '</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('home'); });
+    $all('.word-card', $('#app')).forEach(function(btn, i){
+      btn.addEventListener('click', function(){ speak(s.words[i].hanzi, 'zh-CN'); });
+    });
+    $all('.mode-btn', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){ go(btn.getAttribute('data-mode'), s.id); });
+    });
+  }
+
+  /* ============ MATCH-UP GAME ============ */
+  var matchRun = null; // { subjectId, order:[words], idx, locked }
+
+  function startMatch(subjectId){
+    var s = findSubject(subjectId);
+    matchRun = { subjectId: subjectId, order: shuffle(s.words), idx: 0, locked:false };
+  }
+
+  function renderMatch(subjectId){
+    if (!matchRun || matchRun.subjectId !== subjectId) startMatch(subjectId);
+    var s = findSubject(subjectId);
+
+    if (matchRun.idx >= matchRun.order.length){
+      markDone(subjectId, 'match');
+      renderCelebrate(s, 'match');
+      return;
     }
 
-    function toggleDifficulty() {
-      const showEn = document.getElementById('toggleEnglish').checked;
-      const showPic = document.getElementById('togglePictures').checked;
-      document.body.classList.toggle('hide-english', !showEn);
-      document.body.classList.toggle('hide-pictures', !showPic);
-    }
+    var target = matchRun.order[matchRun.idx];
+    var distractors = shuffle(s.words.filter(function(w){ return w.hanzi !== target.hanzi; })).slice(0,3);
+    var choices = shuffle([target].concat(distractors));
 
-    function renderTopicList() {
-      const container = document.getElementById('topicList');
-      container.innerHTML = '';
-      Object.keys(LESSONS).forEach(key => {
-        const btn = document.createElement('button');
-        btn.className = `topic-pill ${key === currentTopic ? 'active' : ''}`;
-        btn.innerText = LESSONS[key].title;
-        btn.onclick = () => {
-          currentTopic = key;
-          renderTopicList();
-          resetRound();
-        };
-        container.appendChild(btn);
-      });
-    }
+    var dots = matchRun.order.map(function(w,i){
+      var cls = i < matchRun.idx ? 'done' : (i === matchRun.idx ? 'current' : '');
+      return '<span class="dot '+cls+'"></span>';
+    }).join('');
 
-    function switchMode(mode) {
-      currentMode = mode;
-      document.getElementById('btnListen').classList.toggle('active', mode === 'listen');
-      document.getElementById('btnMemory').classList.toggle('active', mode === 'memory');
-      document.getElementById('listenPromptBox').style.display = mode === 'listen' ? 'block' : 'none';
-      resetRound();
-    }
+    var choiceHtml = choices.map(function(w, i){
+      return '<button class="choice-tile" data-hanzi="'+escapeHtml(w.hanzi)+'" data-i="'+i+'">'+visualHtml(w,48)+'</button>';
+    }).join('');
 
-    function updateBulbs() {
-      for (let i = 0; i < TOTAL_QUESTIONS; i++) {
-        const bulb = document.getElementById(`bulb-${i}`);
-        bulb.classList.remove('current');
-        if (i === currentQuestionIndex && currentQuestionIndex < TOTAL_QUESTIONS) {
-          bulb.classList.add('current');
+    $('#app').innerHTML =
+      '<div class="top">'+
+        '<button class="back-btn">← '+escapeHtml(s.name)+'</button>'+
+      '</div>'+
+      '<h2>Match-Up · '+escapeHtml(s.name)+'</h2>'+
+      '<div class="progress-dots">'+dots+'</div>'+
+      '<button class="prompt-card" id="promptCard">'+
+        '<div class="hanzi">'+escapeHtml(target.hanzi)+'</div>'+
+        '<div class="pinyin">'+escapeHtml(target.pinyin)+'</div>'+
+        '<div class="tap-hint">🔊 Tap to hear it again</div>'+
+      '</button>'+
+      '<div class="choice-grid">'+choiceHtml+'</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ matchRun=null; go('subject', subjectId); });
+    $('#promptCard', $('#app')).addEventListener('click', function(){ speak(target.hanzi, 'zh-CN'); });
+    speak(target.hanzi, 'zh-CN');
+
+    $all('.choice-tile', $('#app')).forEach(function(tile){
+      tile.addEventListener('click', function(){
+        if (matchRun.locked) return;
+        var isCorrect = tile.getAttribute('data-hanzi') === target.hanzi;
+        if (isCorrect){
+          matchRun.locked = true;
+          tile.classList.add('correct');
+          playCorrectSound();
+          speak(target.hanzi + '，' + target.en, 'zh-CN');
+          setTimeout(function(){
+            matchRun.idx += 1;
+            matchRun.locked = false;
+            renderMatch(subjectId);
+          }, 850);
+        } else {
+          tile.classList.add('wrong');
+          playWrongSound();
+          setTimeout(function(){ tile.classList.remove('wrong'); }, 420);
         }
-      }
+      });
+    });
+  }
+
+  /* ============ MEMORY GAME ============ */
+  var memRun = null; // { subjectId, cards:[{key,type,word,matched}], open:[idx], busy, found }
+
+  function buildMemoryCards(s){
+    var cards = [];
+    s.words.forEach(function(w){
+      cards.push({ key:w.hanzi, type:'text', word:w, matched:false });
+      cards.push({ key:w.hanzi, type:'visual', word:w, matched:false });
+    });
+    return shuffle(cards);
+  }
+
+  function startMemory(subjectId){
+    var s = findSubject(subjectId);
+    memRun = { subjectId: subjectId, cards: buildMemoryCards(s), open:[], busy:false, found:0 };
+  }
+
+  function memColumns(n){
+    if (n <= 16) return 4;
+    return 5;
+  }
+
+  function renderMemory(subjectId){
+    if (!memRun || memRun.subjectId !== subjectId) startMemory(subjectId);
+    var s = findSubject(subjectId);
+
+    if (memRun.found === s.words.length){
+      markDone(subjectId, 'memory');
+      renderCelebrate(s, 'memory');
+      return;
     }
 
-    function resetBulbs() {
-      for (let i = 0; i < TOTAL_QUESTIONS; i++) {
-        const bulb = document.getElementById(`bulb-${i}`);
-        bulb.className = 'bulb';
-      }
-    }
+    var cols = memColumns(memRun.cards.length);
+    var cardsHtml = memRun.cards.map(function(c, i){
+      var isOpen = memRun.open.indexOf(i) !== -1;
+      var stateClass = c.matched ? 'is-matched' : (isOpen ? 'is-open' : '');
+      var backInner = c.type === 'visual'
+        ? visualHtml(c.word, 40)
+        : '<span class="hanzi">'+escapeHtml(c.word.hanzi)+'</span><span class="pinyin">'+escapeHtml(c.word.pinyin)+'</span>';
+      return (
+        '<div class="flip-card '+stateClass+'" data-i="'+i+'">'+
+          '<button aria-label="memory card">'+
+            '<span class="flip-face flip-front">🐼</span>'+
+            '<span class="flip-face flip-back">'+backInner+'</span>'+
+          '</button>'+
+        '</div>'
+      );
+    }).join('');
 
-    function resetRound() {
-      document.getElementById('resultsModal').style.display = 'none';
-      currentQuestionIndex = 0;
-      correctCount = 0;
-      hadMistakeOnCurrent = false;
-      resetBulbs();
-      updateBulbs();
-      loadQuestion();
-    }
+    $('#app').innerHTML =
+      '<div class="top">'+
+        '<button class="back-btn">← '+escapeHtml(s.name)+'</button>'+
+      '</div>'+
+      '<h2>Memory · '+escapeHtml(s.name)+'</h2>'+
+      '<div class="stat-row"><span>Pairs found: <b>'+memRun.found+' / '+s.words.length+'</b></span></div>'+
+      '<div class="memory-grid" style="--cols:'+cols+'">'+cardsHtml+'</div>';
 
-    function shuffleArray(arr) {
-      return arr.slice().sort(() => Math.random() - 0.5);
-    }
+    $('.back-btn', $('#app')).addEventListener('click', function(){ memRun=null; go('subject', subjectId); });
 
-    function loadQuestion() {
-      const board = document.getElementById('board');
-      board.innerHTML = '';
-      isBoardLocked = false;
-      hadMistakeOnCurrent = false;
-      memoryFlipped = [];
-      updateBulbs();
+    $all('.flip-card', $('#app')).forEach(function(el){
+      el.querySelector('button').addEventListener('click', function(){
+        if (memRun.busy) return;
+        var i = parseInt(el.getAttribute('data-i'),10);
+        var card = memRun.cards[i];
+        if (card.matched || memRun.open.indexOf(i) !== -1) return;
+        if (memRun.open.length === 0){
+          memRun.open = [i];
+          renderMemory(subjectId);
+          return;
+        }
+        if (memRun.open.length === 1){
+          var firstI = memRun.open[0];
+          var first = memRun.cards[firstI];
+          memRun.open.push(i);
+          if (first.key === card.key && first.type !== card.type){
+            first.matched = true; card.matched = true;
+            memRun.found += 1;
+            memRun.open = [];
+            playCorrectSound();
+            speak(card.word.hanzi, 'zh-CN');
+            renderMemory(subjectId);
+          } else {
+            memRun.busy = true;
+            playWrongSound();
+            renderMemory(subjectId);
+            setTimeout(function(){
+              memRun.open = [];
+              memRun.busy = false;
+              renderMemory(subjectId);
+            }, 800);
+          }
+        }
+      });
+    });
+  }
 
-      const words = LESSONS[currentTopic].items;
+  /* ============ celebration screen ============ */
+  function renderCelebrate(s, mode){
+    var label = mode === 'match' ? 'Match-Up' : 'Memory';
+    var otherMode = mode === 'match' ? 'memory' : 'match';
+    var otherLabel = mode === 'match' ? 'Memory' : 'Match-Up';
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← '+escapeHtml(s.name)+'</button></div>'+
+      '<div class="celebrate">'+
+        '<div class="big-emoji">🎉</div>'+
+        '<h2>Great job!</h2>'+
+        '<p>You finished '+label+' for '+escapeHtml(s.name)+'.</p>'+
+        '<div class="stars-row">⭐⭐⭐</div>'+
+        '<div class="btn-col">'+
+          '<button class="btn primary" data-go="'+mode+'">Play Again</button>'+
+          '<button class="btn secondary" data-go="'+otherMode+'">Try '+otherLabel+'</button>'+
+          '<button class="btn secondary" data-go="subject">Back to '+escapeHtml(s.name)+'</button>'+
+        '</div>'+
+      '</div>';
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('subject', s.id); });
+    $all('[data-go]', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var target = btn.getAttribute('data-go');
+        if (target === 'match') matchRun = null;
+        if (target === 'memory') memRun = null;
+        go(target, s.id);
+      });
+    });
+  }
 
-      if (currentMode === 'listen') {
-        // Listen & Pop: Random target question
-        targetWord = words[Math.floor(Math.random() * words.length)];
-        setTimeout(() => speakWord(targetWord.hanzi), 350);
+  /* ============ router ============ */
+  function renderApp(){
+    if (STATE.view === 'subject') renderSubject(STATE.subjectId);
+    else if (STATE.view === 'match') renderMatch(STATE.subjectId);
+    else if (STATE.view === 'memory') renderMemory(STATE.subjectId);
+    else renderHome();
+  }
 
-        shuffleArray(words).forEach(item => {
-          const cardEl = document.createElement('div');
-          cardEl.className = 'card';
-          cardEl.innerHTML = `
-            <div class="card-icon">${item.icon}</div>
-            <div class="card-hanzi">${item.hanzi}</div>
-            <div class="card-english">${item.en}</div>
-          `;
-
-          cardEl.onclick = () => {
-            if (isBoardLocked) return;
-
-            if (item.hanzi === targetWord.hanzi) {
-              isBoardLocked = true;
-              cardEl.classList.add('matched');
-              speakWord("对了! " + item.hanzi);
-
-              // Update bulb
-              const bulb = document.getElementById(`bulb-${currentQuestionIndex}`);
-              if (!hadMistakeOnCurrent) {
-                bulb.classList.add('green');
-                correctCount++;
-              } else {
-                bulb.classList.add('red');
-              }
-
-              setTimeout(() => {
-                currentQuestionIndex++;
-                if (currentQuestionIndex < TOTAL_QUESTIONS) {
-                  loadQuestion();
-                } else {
-                  finishSet();
-                }
-              }, 1000);
-
-            } else {
-              // Incorrect selection
-              hadMistakeOnCurrent = true;
-              speakWord("不对哦");
-              cardEl.style.borderColor = '#EF4444';
-              setTimeout(() => cardEl.style.borderColor = '#F3EDE4', 600);
-            }
-          };
-
-          board.appendChild(cardEl);
-        });
-
-      } else {
-        // Memory Flip (Round of 10 matches)
-        let deck = [];
-        words.forEach((item, id) => {
-          deck.push({ id, kind: 'zh', data: item });
-          deck.push({ id, kind: 'en', data: item });
-        });
-        deck = shuffleArray(deck);
-
-        deck.forEach(cardInfo => {
-          const cardEl = document.createElement('div');
-          cardEl.className = 'card backside';
-          cardEl.dataset.id = cardInfo.id;
-
-          cardEl.onclick = () => {
-            if (isBoardLocked || cardEl.classList.contains('matched') || cardEl === memoryFlipped[0]?.el) return;
-
-            cardEl.classList.remove('backside');
-            if (cardInfo.kind === 'zh') {
-              cardEl.innerHTML = `
-                <div class="card-hanzi">${cardInfo.data.hanzi}</div>
-                <div class="card-pinyin">${cardInfo.data.pinyin}</div>
-              `;
-            } else {
-              cardEl.innerHTML = `
-                <div class="card-icon">${cardInfo.data.icon}</div>
-                <div class="card-english">${cardInfo.data.en}</div>
-              `;
-            }
-
-            speakWord(cardInfo.data.hanzi);
-            memoryFlipped.push({ el: cardEl, info: cardInfo });
-
-            if (memoryFlipped.length === 2) {
-              isBoardLocked = true;
-              const [first, second] = memoryFlipped;
-
-              if (first.info.id === second.info.id) {
-                setTimeout(() => {
-                  first.el.classList.add('matched');
-                  second.el.classList.add('matched');
-                  memoryFlipped = [];
-                  isBoardLocked = false;
-
-                  const bulb = document.getElementById(`bulb-${currentQuestionIndex}`);
-                  if (!hadMistakeOnCurrent) {
-                    bulb.classList.add('green');
-                    correctCount++;
-                  } else {
-                    bulb.classList.add('red');
-                  }
-
-                  currentQuestionIndex++;
-                  if (currentQuestionIndex >= TOTAL_QUESTIONS) {
-                    finishSet();
-                  } else {
-                    hadMistakeOnCurrent = false;
-                    updateBulbs();
-                  }
-                }, 400);
-              } else {
-                hadMistakeOnCurrent = true;
-                setTimeout(() => {
-                  first.el.classList.add('backside');
-                  second.el.classList.add('backside');
-                  first.el.innerHTML = '';
-                  second.el.innerHTML = '';
-                  memoryFlipped = [];
-                  isBoardLocked = false;
-                }, 900);
-              }
-            }
-          };
-
-          board.appendChild(cardEl);
-        });
-      }
-    }
-
-    function replayAudioPrompt() {
-      if (targetWord) speakWord(targetWord.hanzi);
-    }
-
-    function finishSet() {
-      const modal = document.getElementById('resultsModal');
-      const animBox = document.getElementById('modalAnimBox');
-      const title = document.getElementById('modalTitle');
-      const scoreText = document.getElementById('modalScoreText');
-      const btn = document.getElementById('modalActionBtn');
-
-      modal.style.display = 'flex';
-
-      if (correctCount >= 8) {
-        // SUCCESS (>= 8/10): Dancing Panda + Confetti Blast
-        animBox.innerHTML = '<div class="panda-dancer">🐼</div>';
-        title.innerHTML = '太棒了! Fantastic Job! 🎉';
-        title.style.color = '#059669';
-        scoreText.innerHTML = `Aliza scored <b>${correctCount} / 10</b> on first try!`;
-        btn.innerText = 'Play Again 🌸';
-        btn.style.background = '#10B981';
-
-        speakWord("太棒了, Aliza! 你真棒!");
-        fireConfettiCannon();
-      } else {
-        // RETRY (< 8/10): Encouragement to start again
-        animBox.innerHTML = '<div style="font-size: 70px; margin-bottom: 8px;">🐼💪</div>';
-        title.innerHTML = "Good Try! Let's Practice!";
-        title.style.color = '#D97706';
-        scoreText.innerHTML = `You scored <b>${correctCount} / 10</b>.<br>Let's aim for 8 or more!`;
-        btn.innerText = 'Try Again 🔄';
-        btn.style.background = '#FF5A79';
-
-        speakWord("加油! 我们再试一次吧!");
-      }
-    }
-
-    function fireConfettiCannon() {
-      const count = 200;
-      const defaults = { origin: { y: 0.7 } };
-
-      function fire(particleRatio, opts) {
-        confetti(Object.assign({}, defaults, opts, {
-          particleCount: Math.floor(count * particleRatio)
-        }));
-      }
-
-      fire(0.25, { spread: 26, startVelocity: 55 });
-      fire(0.2, { spread: 60 });
-      fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-      fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-      fire(0.1, { spread: 120, startVelocity: 45 });
-    }
-
-    // Launch
-    renderTopicList();
-    resetRound();
-    toggleDifficulty();
-  </script>
+  renderApp();
+})();
+</script>
 </body>
 </html>
