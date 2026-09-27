@@ -17,6 +17,8 @@
     --bamboo:#2FBF8F;
     --sky:#4C8DFF;
     --purple:#A78BFA;
+    --gold:#E8A317;
+    --teal:#0EA5A5;
     --shadow: 31,42,68;
     --card-back-a:#DCEBFF;
     --card-back-b:#C7DEFF;
@@ -32,6 +34,8 @@
       --bamboo:#4CE0B3;
       --sky:#7AAEFF;
       --purple:#C6B7FF;
+      --gold:#FFCB66;
+      --teal:#4DD9D9;
       --shadow: 3,6,16;
       --card-back-a:#233363;
       --card-back-b:#1B2850;
@@ -47,6 +51,8 @@
     --bamboo:#4CE0B3;
     --sky:#7AAEFF;
     --purple:#C6B7FF;
+    --gold:#FFCB66;
+    --teal:#4DD9D9;
     --shadow: 3,6,16;
     --card-back-a:#233363;
     --card-back-b:#1B2850;
@@ -143,6 +149,49 @@
   .sound-sort-banner .ss-icon{ font-size:38px; flex:none; }
   .sound-sort-banner .ss-title{ font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:800; }
   .sound-sort-banner .ss-desc{ font-size:14px; opacity:.92; font-weight:600; }
+
+  /* ---------- songs banner (home) + song list + song detail ---------- */
+  .songs-banner{
+    display:flex; align-items:center; gap:16px; width:100%; text-align:left; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--coral), color-mix(in srgb, var(--coral) 65%, #000 14%));
+    color:#fff; border-radius:24px; padding:20px 22px; margin-bottom:22px;
+    box-shadow:0 8px 0 color-mix(in srgb, var(--coral) 55%, #000 25%);
+    transition:transform .12s ease;
+  }
+  .songs-banner:hover{ transform:translateY(-2px); }
+  .songs-banner:active{ transform:translateY(2px); }
+  .songs-banner .ss-icon{ font-size:38px; flex:none; }
+  .songs-banner .ss-title{ font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:800; }
+  .songs-banner .ss-desc{ font-size:14px; opacity:.92; font-weight:600; }
+
+  .song-tile{
+    --accent: var(--coral);
+    background:var(--surface); border-radius:24px; padding:20px 18px; text-align:left; border:none; cursor:pointer;
+    box-shadow:0 8px 0 rgba(var(--shadow),0.08), 0 2px 14px rgba(var(--shadow),0.10);
+    display:flex; align-items:center; gap:14px; width:100%; margin-bottom:14px; color:var(--ink);
+    transition:transform .12s ease;
+  }
+  .song-tile:hover{ transform:translateY(-2px); }
+  .song-tile .icon{
+    font-size:32px; width:52px; height:52px; border-radius:16px; flex:none;
+    background:color-mix(in srgb, var(--accent) 18%, transparent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .song-tile .song-title{ font-weight:800; font-size:17px; }
+  .song-tile .song-hanzi{ color:var(--ink-soft); font-weight:700; font-size:14px; margin-top:2px; }
+
+  .song-line{
+    background:var(--surface); border-radius:22px; padding:20px 18px; margin-bottom:14px; cursor:pointer; border:none;
+    width:100%; text-align:center; box-shadow:0 3px 12px rgba(var(--shadow),0.08);
+  }
+  .song-line .hanzi{ font-size:28px; font-weight:700; line-height:1.5; }
+  .song-line .pinyin{ font-size:15px; color:var(--ink-soft); font-weight:700; margin-top:6px; }
+  .song-line .en{ font-size:14px; color:var(--ink-soft); margin-top:6px; }
+  .sing-all-btn{
+    border:none; border-radius:999px; padding:14px 24px; font-weight:800; font-size:16px; cursor:pointer;
+    background:var(--coral); color:#fff; box-shadow:0 5px 0 color-mix(in srgb, var(--coral) 55%, #000 25%);
+    margin-bottom:20px; font-family:'Baloo 2',sans-serif;
+  }
 
   /* ---------- difficulty settings ---------- */
   .settings-panel{
@@ -430,6 +479,27 @@
       ]
     },
     {
+      id: 'vegetables', name: 'Vegetables', icon: '🥕', accent: 'sun',
+      sentence: { zhPrefix:'我爱吃', zhPrefixPinyin:'Wǒ ài chī', zhSuffix:'。', enPrefix:'I love to eat ', enSuffix:'.' },
+      words: [
+        { en:'Potato', hanzi:'土豆', pinyin:'tǔdòu', emoji:'🥔' },
+        { en:'Cucumber', hanzi:'黄瓜', pinyin:'huángguā', emoji:'🥒' },
+        { en:'Chili', hanzi:'辣椒', pinyin:'làjiāo', emoji:'🌶️' },
+        { en:'Tomato', hanzi:'西红柿', pinyin:'xīhóngshì', emoji:'🍅' }
+      ]
+    },
+    {
+      id: 'food', name: 'Food', icon: '🍔', accent: 'teal',
+      sentence: { zhPrefix:'我爱吃', zhPrefixPinyin:'Wǒ ài chī', zhSuffix:'。', enPrefix:'I love to eat ', enSuffix:'.' },
+      words: [
+        { en:'Burger', hanzi:'汉堡', pinyin:'hànbǎo', emoji:'🍔' },
+        { en:'Sandwich', hanzi:'三明治', pinyin:'sānmíngzhì', emoji:'🥪' },
+        { en:'Fries', hanzi:'薯条', pinyin:'shǔtiáo', emoji:'🍟' },
+        { en:'Pizza', hanzi:'披萨饼', pinyin:'pīsàbǐng', emoji:'🍕' },
+        { en:'Chicken nuggets', hanzi:'鸡块', pinyin:'jīkuài', emoji:'🍗' }
+      ]
+    },
+    {
       id: 'family', name: 'Family', icon: '👪', accent: 'purple',
       sentence: { zhPrefix:'这是我的', zhPrefixPinyin:'Zhè shì wǒ de', zhSuffix:'。', enPrefix:'This is my ', enSuffix:'.' },
       words: [
@@ -441,6 +511,48 @@
         { en:'Older sister', hanzi:'姐姐', pinyin:'jiějie', emoji:'👧' },
         { en:'Younger brother', hanzi:'弟弟', pinyin:'dìdi', emoji:'🧒' },
         { en:'Younger sister', hanzi:'妹妹', pinyin:'mèimei', emoji:'👶' }
+      ]
+    },
+    {
+      id: 'numbers', name: 'Numbers', icon: '🔢', accent: 'gold',
+      sentence: { zhPrefix:'这是', zhPrefixPinyin:'Zhè shì', zhSuffix:'。', enPrefix:'This is ', enSuffix:'.' },
+      words: [
+        { en:'One', hanzi:'一', pinyin:'yī', emoji:'1' },
+        { en:'Two', hanzi:'二', pinyin:'èr', emoji:'2' },
+        { en:'Three', hanzi:'三', pinyin:'sān', emoji:'3' },
+        { en:'Four', hanzi:'四', pinyin:'sì', emoji:'4' },
+        { en:'Five', hanzi:'五', pinyin:'wǔ', emoji:'5' },
+        { en:'Six', hanzi:'六', pinyin:'liù', emoji:'6' },
+        { en:'Seven', hanzi:'七', pinyin:'qī', emoji:'7' },
+        { en:'Eight', hanzi:'八', pinyin:'bā', emoji:'8' },
+        { en:'Nine', hanzi:'九', pinyin:'jiǔ', emoji:'9' },
+        { en:'Ten', hanzi:'十', pinyin:'shí', emoji:'10' },
+        { en:'Eleven', hanzi:'十一', pinyin:'shíyī', emoji:'11' },
+        { en:'Twelve', hanzi:'十二', pinyin:'shí’èr', emoji:'12' },
+        { en:'Thirteen', hanzi:'十三', pinyin:'shísān', emoji:'13' },
+        { en:'Fourteen', hanzi:'十四', pinyin:'shísì', emoji:'14' },
+        { en:'Fifteen', hanzi:'十五', pinyin:'shíwǔ', emoji:'15' },
+        { en:'Sixteen', hanzi:'十六', pinyin:'shíliù', emoji:'16' },
+        { en:'Seventeen', hanzi:'十七', pinyin:'shíqī', emoji:'17' },
+        { en:'Eighteen', hanzi:'十八', pinyin:'shíbā', emoji:'18' },
+        { en:'Nineteen', hanzi:'十九', pinyin:'shíjiǔ', emoji:'19' },
+        { en:'Twenty', hanzi:'二十', pinyin:'èrshí', emoji:'20' }
+      ]
+    }
+  ];
+
+  /* ============ SONGS ============
+     Simple sing-along songs: each line has hanzi, pinyin and an English translation.
+     No audio files — lines are read aloud with the same speech synthesis used elsewhere on the site.
+  */
+  var SONGS = [
+    {
+      id: 'shopping-song', title:'What Are You Buying?', titleHanzi:'你买什么？', icon:'🛒', accent:'bamboo',
+      lines: [
+        { hanzi:'你买什么？你买什么？买土豆，买土豆！', pinyin:'Nǐ mǎi shénme? Nǐ mǎi shénme? Mǎi tǔdòu, mǎi tǔdòu!', en:'What are you buying? What are you buying? Buying potato, buying potato!' },
+        { hanzi:'你买什么？你买什么？买黄瓜，买黄瓜！', pinyin:'Nǐ mǎi shénme? Nǐ mǎi shénme? Mǎi huángguā, mǎi huángguā!', en:'What are you buying? What are you buying? Buying cucumber, buying cucumber!' },
+        { hanzi:'你买什么？你买什么？买西红柿，买西红柿！', pinyin:'Nǐ mǎi shénme? Nǐ mǎi shénme? Mǎi xīhóngshì, mǎi xīhóngshì!', en:'What are you buying? What are you buying? Buying tomato, buying tomato!' },
+        { hanzi:'你买什么？你买什么？买辣椒，买辣椒！', pinyin:'Nǐ mǎi shénme? Nǐ mǎi shénme? Mǎi làjiāo, mǎi làjiāo!', en:'What are you buying? What are you buying? Buying chili, buying chili!' }
       ]
     }
   ];
@@ -626,12 +738,17 @@
         '<span class="ss-icon">🔀</span>'+
         '<div><div class="ss-title">Sound Sort</div><div class="ss-desc">Mix two subjects and sort pictures by sound</div></div>'+
       '</button>'+
+      '<button class="songs-banner" id="songsBtn">'+
+        '<span class="ss-icon">🎵</span>'+
+        '<div><div class="ss-title">Songs</div><div class="ss-desc">Sing along, line by line</div></div>'+
+      '</button>'+
       '<footer>Made with ❤️ for a curious learner, one game at a time.</footer>';
 
     $all('.tile', $('#app')).forEach(function(btn){
       btn.addEventListener('click', function(){ go('subject', btn.getAttribute('data-subject')); });
     });
     $('#soundSortBtn', $('#app')).addEventListener('click', function(){ go('sortPicker'); });
+    $('#songsBtn', $('#app')).addEventListener('click', function(){ go('songs'); });
   }
 
   /* ============ SUBJECT HUB ============ */
@@ -1239,6 +1356,83 @@
     $('#sortBackBtn', $('#app')).addEventListener('click', function(){ sortRun=null; go('home'); });
   }
 
+  /* ============ SONGS ============ */
+  function findSong(id){
+    for (var i=0;i<SONGS.length;i++) if (SONGS[i].id === id) return SONGS[i];
+    return null;
+  }
+
+  function renderSongs(){
+    var tiles = SONGS.map(function(song){
+      return (
+        '<button class="song-tile" data-song="'+song.id+'" style="--accent:var(--'+song.accent+')">'+
+          '<span class="icon">'+song.icon+'</span>'+
+          '<div><div class="song-title">'+escapeHtml(song.title)+'</div>'+
+          '<div class="song-hanzi">'+escapeHtml(song.titleHanzi)+'</div></div>'+
+        '</button>'
+      );
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Playroom</button></div>'+
+      '<h2>🎵 Songs</h2>'+
+      '<div class="intro-line">Pick a song to sing along, line by line.</div>'+
+      tiles;
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('home'); });
+    $all('.song-tile', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){ go('songDetail', btn.getAttribute('data-song')); });
+    });
+  }
+
+  function renderSongDetail(songId){
+    var song = findSong(songId);
+    if (!song){ go('songs'); return; }
+
+    var linesHtml = song.lines.map(function(line, i){
+      return (
+        '<button class="song-line" data-i="'+i+'">'+
+          '<div class="hanzi">'+escapeHtml(line.hanzi)+'</div>'+
+          '<div class="pinyin">'+escapeHtml(line.pinyin)+'</div>'+
+          '<div class="en">'+escapeHtml(line.en)+'</div>'+
+        '</button>'
+      );
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Songs</button></div>'+
+      '<h2>'+song.icon+' '+escapeHtml(song.title)+'</h2>'+
+      '<div class="intro-line">Tap a line to hear it, or sing the whole song.</div>'+
+      '<button class="sing-all-btn" id="singAllBtn" type="button">▶️ Sing the whole song</button>'+
+      '<div>'+linesHtml+'</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('songs'); });
+    $all('.song-line', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var i = parseInt(btn.getAttribute('data-i'), 10);
+        speak(song.lines[i].hanzi, 'zh-CN');
+      });
+    });
+    $('#singAllBtn', $('#app')).addEventListener('click', function(){
+      singSongLines(song.lines, 0);
+    });
+  }
+
+  /* Reads each line aloud in turn, waiting for one line to finish before starting the next. */
+  function singSongLines(lines, idx){
+    if (idx >= lines.length) return;
+    try{
+      if (!('speechSynthesis' in window)){ return; }
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(lines[idx].hanzi);
+      u.lang = 'zh-CN';
+      u.rate = 0.9;
+      u.onend = function(){ setTimeout(function(){ singSongLines(lines, idx+1); }, 350); };
+      u.onerror = function(){ setTimeout(function(){ singSongLines(lines, idx+1); }, 350); };
+      window.speechSynthesis.speak(u);
+    }catch(e){ /* speech not available — fail silently */ }
+  }
+
   /* ============ celebration screen (per-subject games) ============ */
   function renderCelebrate(s, mode){
     var labels = { match:'Match-Up', memory:'Memory', sentence:'Sentence Builder', fillblank:'Fill-in-the-Blank', bingo:'Picture Bingo' };
@@ -1279,6 +1473,8 @@
     else if (STATE.view === 'bingo') renderBingo(STATE.subjectId);
     else if (STATE.view === 'sortPicker') renderSortPicker();
     else if (STATE.view === 'soundSort') renderSoundSort();
+    else if (STATE.view === 'songs') renderSongs();
+    else if (STATE.view === 'songDetail') renderSongDetail(STATE.subjectId);
     else renderHome();
   }
 
