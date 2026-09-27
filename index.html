@@ -1,330 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mandarin Playroom</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
-<style>
-  :root{
-    --paper:#F0F7FF;
-    --surface:#FFFFFF;
-    --ink:#1F2A44;
-    --ink-soft:#5B6889;
-    --coral:#FF6B5B;
-    --sun:#FFC145;
-    --bamboo:#2FBF8F;
-    --sky:#4C8DFF;
-    --purple:#A78BFA;
-    --shadow: 31,42,68;
-    --card-back-a:#DCEBFF;
-    --card-back-b:#C7DEFF;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:#0F1830;
-      --surface:#182448;
-      --ink:#EEF3FF;
-      --ink-soft:#9FAFD4;
-      --coral:#FF8A7C;
-      --sun:#FFD873;
-      --bamboo:#4CE0B3;
-      --sky:#7AAEFF;
-      --purple:#C6B7FF;
-      --shadow: 3,6,16;
-      --card-back-a:#233363;
-      --card-back-b:#1B2850;
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#0F1830;
-    --surface:#182448;
-    --ink:#EEF3FF;
-    --ink-soft:#9FAFD4;
-    --coral:#FF8A7C;
-    --sun:#FFD873;
-    --bamboo:#4CE0B3;
-    --sky:#7AAEFF;
-    --purple:#C6B7FF;
-    --shadow: 3,6,16;
-    --card-back-a:#233363;
-    --card-back-b:#1B2850;
-  }
-
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Quicksand', system-ui, sans-serif;
-    padding:20px 16px 48px;
-    min-height:100vh;
-    -webkit-tap-highlight-color: transparent;
-  }
-  h1,h2,h3{ font-family:'Baloo 2', 'Quicksand', system-ui, sans-serif; text-wrap:balance; margin:0; }
-  .hanzi{ font-family:'Noto Sans SC','Baloo 2',sans-serif; }
-  button{ font-family:inherit; }
-  a{ color:inherit; }
-  .swatch{ border:3px solid rgba(120,130,150,.28); }
-
-  .wrap{ max-width:860px; margin:0 auto; }
-
-  /* ---------- header ---------- */
-  .top{
-    display:flex; align-items:center; gap:14px; margin-bottom:22px; flex-wrap:wrap;
-  }
-  .panda{ width:56px; height:56px; flex:none; filter: drop-shadow(0 3px 6px rgba(var(--shadow),0.15)); }
-  .top h1{ font-size:clamp(24px,5vw,32px); color:var(--ink); }
-  .top .tag{ color:var(--ink-soft); font-size:15px; font-weight:600; margin-top:2px; }
-  .top-spacer{ flex:1; }
-  .back-btn{
-    display:inline-flex; align-items:center; gap:6px;
-    background:var(--surface); color:var(--ink); border:none;
-    padding:10px 16px; border-radius:999px; font-weight:700; font-size:15px;
-    cursor:pointer; box-shadow:0 4px 0 rgba(var(--shadow),0.1);
-    transition:transform .12s ease;
-  }
-  .back-btn:hover{ transform:translateY(-1px); }
-  .back-btn:active{ transform:translateY(1px); }
-  .back-btn:focus-visible, button:focus-visible, [tabindex]:focus-visible{
-    outline:3px solid var(--sky); outline-offset:2px;
-  }
-
-  /* ---------- home: subject tiles ---------- */
-  .tiles{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px;
-  }
-  .tile{
-    --accent: var(--sky);
-    background:var(--surface);
-    border-radius:28px;
-    padding:22px 20px 20px;
-    text-align:left;
-    border:none;
-    cursor:pointer;
-    position:relative;
-    overflow:hidden;
-    box-shadow:0 10px 0 rgba(var(--shadow),0.08), 0 2px 14px rgba(var(--shadow),0.10);
-    transition:transform .15s ease, box-shadow .15s ease;
-    display:flex; flex-direction:column; gap:10px;
-    color:var(--ink);
-  }
-  .tile:hover{ transform:translateY(-4px); }
-  .tile:active{ transform:translateY(1px); box-shadow:0 4px 0 rgba(var(--shadow),0.08); }
-  .tile::before{
-    content:""; position:absolute; inset:0 auto auto 0; width:100%; height:8px;
-    background:var(--accent);
-  }
-  .tile .icon{
-    font-size:38px; width:64px; height:64px; border-radius:20px;
-    background:color-mix(in srgb, var(--accent) 18%, transparent);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .tile h2{ font-size:21px; }
-  .tile .preview{ font-size:22px; letter-spacing:2px; opacity:.9; }
-  .tile .stars{ margin-top:auto; display:flex; gap:8px; font-size:14px; color:var(--ink-soft); font-weight:700; }
-  .tile .stars span{ display:inline-flex; align-items:center; gap:4px; }
-  .tile .stars .done{ color:var(--accent); }
-
-  .intro-line{ color:var(--ink-soft); font-size:16px; font-weight:600; margin:2px 0 20px; }
-
-  /* ---------- subject hub ---------- */
-  .subject-head{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
-  .subject-head .icon-badge{
-    --accent: var(--sky);
-    width:52px; height:52px; border-radius:16px; font-size:28px;
-    background:color-mix(in srgb, var(--accent) 20%, transparent);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .subject-head h2{ font-size:26px; }
-
-  .word-grid{
-    display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:14px; margin-bottom:24px;
-  }
-  .word-card{
-    background:var(--surface); border-radius:20px; padding:14px 10px 12px; text-align:center;
-    border:none; cursor:pointer; box-shadow:0 3px 10px rgba(var(--shadow),0.08);
-    display:flex; flex-direction:column; align-items:center; gap:4px;
-    transition:transform .12s ease;
-  }
-  .word-card:hover{ transform:translateY(-2px); }
-  .word-card:active{ transform:scale(.97); }
-  .word-card .visual{ font-size:34px; line-height:1; margin-bottom:2px; }
-  .word-card .swatch{ width:38px; height:38px; border-radius:50%; margin-bottom:2px; box-shadow: inset 0 -4px 8px rgba(0,0,0,.12); }
-  .word-card .hanzi{ font-size:22px; font-weight:700; }
-  .word-card .pinyin{ font-size:13px; color:var(--ink-soft); font-weight:600; }
-  .word-card .en{ font-size:12px; color:var(--ink-soft); }
-  .word-card .speak-note{ font-size:16px; margin-top:2px; }
-
-  .mode-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
-  .mode-btn{
-    --accent: var(--coral);
-    border:none; border-radius:24px; cursor:pointer; text-align:left;
-    padding:20px 22px; color:#fff;
-    background:linear-gradient(160deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #000 12%));
-    box-shadow:0 10px 0 color-mix(in srgb, var(--accent) 55%, #000 25%);
-    display:flex; flex-direction:column; gap:6px;
-    transition:transform .12s ease;
-  }
-  .mode-btn:hover{ transform:translateY(-3px); }
-  .mode-btn:active{ transform:translateY(2px); box-shadow:0 5px 0 color-mix(in srgb, var(--accent) 55%, #000 25%); }
-  .mode-btn .emo{ font-size:32px; }
-  .mode-btn .title{ font-size:20px; font-weight:800; font-family:'Baloo 2',sans-serif; }
-  .mode-btn .desc{ font-size:14px; opacity:.92; font-weight:600; }
-
-  /* ---------- match-up game ---------- */
-  .progress-dots{ display:flex; gap:8px; margin:6px 0 20px; flex-wrap:wrap; }
-  .progress-dots .dot{ width:14px; height:14px; border-radius:50%; background:color-mix(in srgb, var(--ink-soft) 30%, transparent); }
-  .progress-dots .dot.done{ background:var(--bamboo); }
-  .progress-dots .dot.current{ outline:3px solid var(--sky); outline-offset:2px; }
-
-  .prompt-card{
-    background:var(--surface); border-radius:28px; padding:34px 20px; text-align:center; margin-bottom:26px;
-    box-shadow:0 3px 16px rgba(var(--shadow),0.10);
-    cursor:pointer; border:none; width:100%; color:var(--ink);
-  }
-  .prompt-card .hanzi{ font-size:64px; font-weight:700; line-height:1; }
-  .prompt-card .pinyin{ font-size:22px; color:var(--ink-soft); font-weight:700; margin-top:6px; }
-  .prompt-card .tap-hint{ font-size:14px; color:var(--ink-soft); margin-top:10px; font-weight:600; }
-
-  .choice-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:16px; }
-  .choice-tile{
-    background:var(--surface); border:4px solid transparent; border-radius:22px; padding:20px 10px;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    box-shadow:0 3px 10px rgba(var(--shadow),0.08);
-    transition:transform .1s ease, border-color .15s ease;
-    aspect-ratio:1/1;
-  }
-  .choice-tile .visual{ font-size:44px; }
-  .choice-tile .swatch{ width:48px; height:48px; border-radius:50%; box-shadow: inset 0 -5px 10px rgba(0,0,0,.14); }
-  .choice-tile:hover{ transform:translateY(-2px); }
-  .choice-tile.correct{ border-color:var(--bamboo); animation: pop .5s ease; }
-  .choice-tile.wrong{ animation: shake .4s ease; border-color:var(--coral); }
-
-  @keyframes pop{ 0%{transform:scale(1);} 40%{transform:scale(1.12);} 100%{transform:scale(1);} }
-  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
-
-  /* ---------- memory game ---------- */
-  .memory-grid{ display:grid; gap:12px; grid-template-columns:repeat(var(--cols,4), 1fr); }
-  .flip-card{ perspective:800px; aspect-ratio:1/1; }
-  .flip-card button{
-    width:100%; height:100%; border:none; background:none; cursor:pointer; padding:0;
-    position:relative; transform-style:preserve-3d; transition:transform .45s cubic-bezier(.2,.9,.3,1.1);
-  }
-  .flip-card.is-open button, .flip-card.is-matched button{ transform:rotateY(180deg); }
-  .flip-face{
-    position:absolute; inset:0; backface-visibility:hidden; border-radius:16px;
-    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2px;
-    box-shadow:0 3px 10px rgba(var(--shadow),0.10);
-  }
-  .flip-front{
-    background:repeating-linear-gradient(135deg, var(--card-back-a) 0 14px, var(--card-back-b) 14px 28px);
-    font-size:26px;
-  }
-  .flip-back{ background:var(--surface); transform:rotateY(180deg); padding:6px; text-align:center; }
-  .flip-back .visual{ font-size:clamp(22px,6vw,36px); }
-  .flip-back .swatch{ width:60%; aspect-ratio:1/1; border-radius:50%; box-shadow: inset 0 -5px 10px rgba(0,0,0,.14); }
-  .flip-back .hanzi{ font-size:clamp(16px,4vw,24px); font-weight:700; }
-  .flip-back .pinyin{ font-size:clamp(9px,2.4vw,12px); color:var(--ink-soft); font-weight:700; }
-  .flip-card.is-matched .flip-back{ background:color-mix(in srgb, var(--bamboo) 22%, var(--surface)); }
-
-  .stat-row{ display:flex; gap:18px; margin-bottom:18px; flex-wrap:wrap; font-weight:700; color:var(--ink-soft); }
-  .stat-row b{ color:var(--ink); }
-
-  /* ---------- completion overlay ---------- */
-  .celebrate{
-    background:var(--surface); border-radius:28px; padding:36px 26px; text-align:center;
-    box-shadow:0 8px 30px rgba(var(--shadow),0.16); max-width:420px; margin:20px auto 0;
-  }
-  .celebrate .big-emoji{ font-size:56px; margin-bottom:6px; }
-  .celebrate h2{ font-size:24px; margin-bottom:6px; }
-  .celebrate p{ color:var(--ink-soft); font-weight:600; margin:0 0 20px; }
-  .celebrate .stars-row{ font-size:34px; margin-bottom:22px; letter-spacing:4px; }
-  .celebrate .btn-col{ display:flex; flex-direction:column; gap:10px; }
-  .celebrate .btn{
-    border:none; border-radius:16px; padding:14px; font-weight:800; font-size:15px; cursor:pointer;
-    font-family:'Baloo 2',sans-serif;
-  }
-  .celebrate .btn.primary{ background:var(--bamboo); color:#0b3327; }
-  .celebrate .btn.secondary{ background:color-mix(in srgb, var(--sky) 18%, transparent); color:var(--ink); }
-
-  footer{ text-align:center; color:var(--ink-soft); font-size:13px; font-weight:600; margin-top:40px; }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
-  }
-
-  @media (max-width:480px){
-    .choice-grid{ grid-template-columns:repeat(2,1fr); }
-    .memory-grid{ --cols:3 !important; }
-  }
-</style>
-</head>
-<body>
-<div class="wrap" id="app"></div>
-
-<script>
-(function(){
-  "use strict";
-
-  /* ============ VOCABULARY DATA ============
-     Add new subjects or words here (or ask Claude to add them from a class PDF, then re-export this file).
-     Each word needs: en, hanzi, pinyin, and either `emoji` (a picture) or `swatch` (a hex color, for color words).
-  */
-  var SUBJECTS = [
-    {
-      id: 'animals', name: 'Animals', icon: '🐾', accent: 'bamboo',
-      words: [
-        { en:'Dog', hanzi:'狗', pinyin:'gǒu', emoji:'🐶' },
-        { en:'Cat', hanzi:'猫', pinyin:'māo', emoji:'🐱' },
-        { en:'Bird', hanzi:'鸟', pinyin:'niǎo', emoji:'🐦' },
-        { en:'Fish', hanzi:'鱼', pinyin:'yú', emoji:'🐟' },
-        { en:'Rabbit', hanzi:'兔子', pinyin:'tùzi', emoji:'🐰' },
-        { en:'Panda', hanzi:'熊猫', pinyin:'xióngmāo', emoji:'🐼' }
-      ]
-    },
-    {
-      id: 'colors', name: 'Colors', icon: '🎨', accent: 'sky',
-      words: [
-        { en:'Red', hanzi:'红色', pinyin:'hóngsè', swatch:'#FF6B5B' },
-        { en:'Yellow', hanzi:'黄色', pinyin:'huángsè', swatch:'#FFC145' },
-        { en:'Blue', hanzi:'蓝色', pinyin:'lánsè', swatch:'#4C8DFF' },
-        { en:'Green', hanzi:'绿色', pinyin:'lǜsè', swatch:'#2FBF8F' },
-        { en:'Pink', hanzi:'粉色', pinyin:'fěnsè', swatch:'#FF8FB3' },
-        { en:'Purple', hanzi:'紫色', pinyin:'zǐsè', swatch:'#A78BFA' },
-        { en:'Black', hanzi:'黑色', pinyin:'hēisè', swatch:'#2B2B33' },
-        { en:'White', hanzi:'白色', pinyin:'báisè', swatch:'#FFFFFF' }
-      ]
-    },
-    {
-      id: 'fruits', name: 'Fruits', icon: '🍎', accent: 'coral',
-      words: [
-        { en:'Apple', hanzi:'苹果', pinyin:'píngguǒ', emoji:'🍎' },
-        { en:'Banana', hanzi:'香蕉', pinyin:'xiāngjiāo', emoji:'🍌' },
-        { en:'Grapes', hanzi:'葡萄', pinyin:'pútáo', emoji:'🍇' },
-        { en:'Strawberry', hanzi:'草莓', pinyin:'cǎoméi', emoji:'🍓' },
-        { en:'Peach', hanzi:'桃子', pinyin:'táozi', emoji:'🍑' },
-        { en:'Orange', hanzi:'橙子', pinyin:'chéngzi', emoji:'🍊' },
-        { en:'Watermelon', hanzi:'西瓜', pinyin:'xīguā', emoji:'🍉' },
-        { en:'Blueberry', hanzi:'蓝莓', pinyin:'lánméi', emoji:'🫐' }
-      ]
-    },
-    {
-      id: 'family', name: 'Family', icon: '👪', accent: 'purple',
-      words: [
-        { en:'Grandpa', hanzi:'爷爷', pinyin:'yéye', emoji:'👴' },
-        { en:'Grandma', hanzi:'奶奶', pinyin:'nǎinai', emoji:'👵' },
-        { en:'Dad', hanzi:'爸爸', pinyin:'bàba', emoji:'👨' },
-        { en:'Mom', hanzi:'妈妈', pinyin:'māma', emoji:'👩' },
-        { en:'Older brother', hanzi:'哥哥', pinyin:'gēge', emoji:'👦' },
-        { en:'Older sister', hanzi:'姐姐', pinyin:'jiějie', emoji:'👧' },
-        { en:'Younger brother', hanzi:'弟弟', pinyin:'dìdi', emoji:'🧒' },
-        { en:'Younger sister', hanzi:'妹妹', pinyin:'mèimei', emoji:'👶' }
-      ]
-    }
-  ];
-
   /* ============ small helpers ============ */
   function $(sel, root){ return (root||document).querySelector(sel); }
   function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
@@ -341,6 +14,7 @@
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   }
+
   /* ---- short feedback chimes (synthesized, no audio files needed) ---- */
   var audioCtx = null;
   function getAudioCtx(){
@@ -393,15 +67,55 @@
     for (var i=0;i<SUBJECTS.length;i++) if (SUBJECTS[i].id === id) return SUBJECTS[i];
     return null;
   }
-  function visualHtml(word, size){
+  function sentenceZh(subject, word){ return subject.sentence.zhPrefix + word.hanzi + subject.sentence.zhSuffix; }
+  function sentenceEn(subject, word){ return subject.sentence.enPrefix + word.en.toLowerCase() + subject.sentence.enSuffix; }
+
+  /* Picture for a word: a real image file, an emoji (optionally on a colored swatch), or a plain swatch. */
+  function visualHtml(word){
+    if (word.img){
+      return '<span class="visual-img"><img src="'+word.img+'" alt="'+escapeHtml(word.en)+'"></span>';
+    }
+    if (word.emoji && word.swatch){
+      return '<span class="swatch" style="background:'+word.swatch+'">'+word.emoji+'</span>';
+    }
     if (word.swatch){
-      return '<span class="swatch" style="background:'+word.swatch+'; width:'+(size||38)+'px; height:'+(size||38)+'px;"></span>';
+      return '<span class="swatch" style="background:'+word.swatch+'"></span>';
     }
     return '<span class="visual">'+word.emoji+'</span>';
   }
+  /* Used anywhere a picture would normally appear (match-up/bingo choices, memory's picture side).
+     When "Hide pictures" is on, falls back to a text label instead — English, or pinyin if
+     "Hide English" is also on — so the game still works, just harder. */
+  function visualOrTextHtml(word){
+    if (!SETTINGS.hideImages) return visualHtml(word);
+    var label = SETTINGS.hideEnglish ? word.pinyin : word.en;
+    return '<span class="fallback-label">'+escapeHtml(label)+'</span>';
+  }
+  /* Small picture used in the home-screen subject tile preview strip. */
+  function previewChip(word){
+    if (word.img) return '<span class="visual-img" style="width:18px;height:27px;display:inline-flex;vertical-align:middle;"><img src="'+word.img+'" alt=""></span>';
+    if (word.emoji) return '<span style="font-size:22px;vertical-align:middle;">'+word.emoji+'</span>';
+    if (word.swatch) return '<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:'+word.swatch+';vertical-align:middle;border:2px solid rgba(120,130,150,.28);"></span>';
+    return '';
+  }
+
+  /* ============ difficulty settings (per-device, local only) ============ */
+  var SETTINGS_KEY = 'mandarin-playroom-settings-v1';
+  function loadSettings(){
+    try{
+      var raw = window.localStorage.getItem(SETTINGS_KEY);
+      var s = raw ? JSON.parse(raw) : {};
+      return { hideImages: !!s.hideImages, hideEnglish: !!s.hideEnglish };
+    }catch(e){ return { hideImages:false, hideEnglish:false }; }
+  }
+  function saveSettings(s){
+    try{ window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }catch(e){ /* ignore */ }
+  }
+  var SETTINGS = loadSettings();
 
   /* ============ progress (per-device, local only) ============ */
-  var PROGRESS_KEY = 'mandarin-playroom-progress-v1';
+  var PROGRESS_KEY = 'mandarin-playroom-progress-v2';
+  var GAME_MODES = ['match','memory','sentence','fillblank','bingo'];
   function loadProgress(){
     try{
       var raw = window.localStorage.getItem(PROGRESS_KEY);
@@ -425,6 +139,7 @@
     STATE = { view:view, subjectId: subjectId || null };
     renderApp();
     window.scrollTo(0,0);
+    persistHot();
   }
 
   /* ============ mascot ============ */
@@ -442,31 +157,34 @@
     var progress = loadProgress();
     var tiles = SUBJECTS.map(function(s){
       var done = progress[s.id] || {};
-      var preview = s.words.slice(0,4).map(function(w){ return w.emoji || ''; }).filter(Boolean).join(' ');
+      var preview = s.words.slice(0,4).map(previewChip).join(' ');
+      var starsRow = GAME_MODES.map(function(m){ return done[m] ? '⭐' : '☆'; }).join('');
       return (
         '<button class="tile" data-subject="'+s.id+'" style="--accent:var(--'+s.accent+')">'+
           '<span class="icon">'+s.icon+'</span>'+
           '<h2>'+escapeHtml(s.name)+'</h2>'+
-          (preview ? '<div class="preview">'+preview+'</div>' : '<div class="preview">'+s.words.slice(0,6).map(function(w){return '<span class="swatch" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:'+w.swatch+';margin-right:4px;vertical-align:middle;"></span>';}).join('')+'</div>')+
-          '<div class="stars">'+
-            '<span class="'+(done.match?'done':'')+'">'+(done.match?'⭐':'☆')+' Match-Up</span>'+
-            '<span class="'+(done.memory?'done':'')+'">'+(done.memory?'⭐':'☆')+' Memory</span>'+
-          '</div>'+
+          '<div class="preview">'+preview+'</div>'+
+          '<div class="stars"><span>'+starsRow+'</span></div>'+
         '</button>'
       );
     }).join('');
 
     $('#app').innerHTML =
       '<div class="top">'+PANDA_SVG+
-        '<div><h1>Mandarin Playroom</h1><div class="tag">Learn Chinese words through play</div></div>'+
+        '<div><h1>Mandarin Playroom</h1><div class="tag">Learn Chinese words and sentences through play</div></div>'+
       '</div>'+
       '<div class="intro-line">Pick a subject to start playing!</div>'+
       '<div class="tiles">'+tiles+'</div>'+
-      '<footer>Made with ❤️ for a curious 4-year-old learning Mandarin, one game at a time.</footer>';
+      '<button class="sound-sort-banner" id="soundSortBtn">'+
+        '<span class="ss-icon">🔀</span>'+
+        '<div><div class="ss-title">Sound Sort</div><div class="ss-desc">Mix two subjects and sort pictures by sound</div></div>'+
+      '</button>'+
+      '<footer>Made with ❤️ for a curious learner, one game at a time.</footer>';
 
     $all('.tile', $('#app')).forEach(function(btn){
       btn.addEventListener('click', function(){ go('subject', btn.getAttribute('data-subject')); });
     });
+    $('#soundSortBtn', $('#app')).addEventListener('click', function(){ go('sortPicker'); });
   }
 
   /* ============ SUBJECT HUB ============ */
@@ -476,10 +194,10 @@
     var cards = s.words.map(function(w){
       return (
         '<button class="word-card" data-hanzi="'+escapeHtml(w.hanzi)+'">'+
-          visualHtml(w, 38)+
+          (SETTINGS.hideImages ? '' : visualHtml(w))+
           '<span class="hanzi">'+escapeHtml(w.hanzi)+'</span>'+
           '<span class="pinyin">'+escapeHtml(w.pinyin)+'</span>'+
-          '<span class="en">'+escapeHtml(w.en)+'</span>'+
+          (SETTINGS.hideEnglish ? '' : '<span class="en">'+escapeHtml(w.en)+'</span>')+
           '<span class="speak-note">🔊</span>'+
         '</button>'
       );
@@ -495,6 +213,11 @@
         '<h2>'+escapeHtml(s.name)+'</h2>'+
       '</div>'+
       '<div class="intro-line">Tap a word to hear it, then try a game.</div>'+
+      '<div class="settings-panel">'+
+        '<span class="set-label">🎚️ Make it harder:</span>'+
+        '<label><input type="checkbox" id="hideImagesChk" '+(SETTINGS.hideImages?'checked':'')+'> Hide pictures</label>'+
+        '<label><input type="checkbox" id="hideEnglishChk" '+(SETTINGS.hideEnglish?'checked':'')+'> Hide English</label>'+
+      '</div>'+
       '<div class="word-grid">'+cards+'</div>'+
       '<div class="mode-row">'+
         '<button class="mode-btn" data-mode="match" style="--accent:var(--coral)">'+
@@ -505,6 +228,18 @@
           '<span class="emo">🃏</span><span class="title">Memory</span>'+
           '<span class="desc">Flip cards to find the matching pairs</span>'+
         '</button>'+
+        '<button class="mode-btn" data-mode="sentence" style="--accent:var(--sun)">'+
+          '<span class="emo">🧱</span><span class="title">Sentence Builder</span>'+
+          '<span class="desc">Arrange tiles to build a sentence</span>'+
+        '</button>'+
+        '<button class="mode-btn" data-mode="fillblank" style="--accent:var(--sky)">'+
+          '<span class="emo">📝</span><span class="title">Fill-in-the-Blank</span>'+
+          '<span class="desc">Complete the sentence with the right picture</span>'+
+        '</button>'+
+        '<button class="mode-btn" data-mode="bingo" style="--accent:var(--bamboo)">'+
+          '<span class="emo">🎯</span><span class="title">Picture Bingo</span>'+
+          '<span class="desc">Listen and tap every picture called</span>'+
+        '</button>'+
       '</div>';
 
     $('.back-btn', $('#app')).addEventListener('click', function(){ go('home'); });
@@ -513,6 +248,16 @@
     });
     $all('.mode-btn', $('#app')).forEach(function(btn){
       btn.addEventListener('click', function(){ go(btn.getAttribute('data-mode'), s.id); });
+    });
+    $('#hideImagesChk', $('#app')).addEventListener('change', function(){
+      SETTINGS.hideImages = this.checked;
+      saveSettings(SETTINGS);
+      renderSubject(id);
+    });
+    $('#hideEnglishChk', $('#app')).addEventListener('change', function(){
+      SETTINGS.hideEnglish = this.checked;
+      saveSettings(SETTINGS);
+      renderSubject(id);
     });
   }
 
@@ -544,7 +289,7 @@
     }).join('');
 
     var choiceHtml = choices.map(function(w, i){
-      return '<button class="choice-tile" data-hanzi="'+escapeHtml(w.hanzi)+'" data-i="'+i+'">'+visualHtml(w,48)+'</button>';
+      return '<button class="choice-tile" data-hanzi="'+escapeHtml(w.hanzi)+'" data-i="'+i+'">'+visualOrTextHtml(w)+'</button>';
     }).join('');
 
     $('#app').innerHTML =
@@ -624,7 +369,7 @@
       var isOpen = memRun.open.indexOf(i) !== -1;
       var stateClass = c.matched ? 'is-matched' : (isOpen ? 'is-open' : '');
       var backInner = c.type === 'visual'
-        ? visualHtml(c.word, 40)
+        ? visualOrTextHtml(c.word)
         : '<span class="hanzi">'+escapeHtml(c.word.hanzi)+'</span><span class="pinyin">'+escapeHtml(c.word.pinyin)+'</span>';
       return (
         '<div class="flip-card '+stateClass+'" data-i="'+i+'">'+
@@ -683,11 +428,374 @@
     });
   }
 
-  /* ============ celebration screen ============ */
+  /* ============ SENTENCE BUILDER ============ */
+  var sbRun = null; // { subjectId, order, idx, slots:[pieceId|null, pieceId|null], bankOrder:[0,1]|null, locked }
+
+  function startSentenceBuilder(subjectId){
+    var s = findSubject(subjectId);
+    sbRun = { subjectId: subjectId, order: shuffle(s.words), idx:0, slots:[null,null], bankOrder:null, locked:false };
+  }
+
+  function renderSentenceBuilder(subjectId){
+    if (!sbRun || sbRun.subjectId !== subjectId) startSentenceBuilder(subjectId);
+    var s = findSubject(subjectId);
+
+    if (sbRun.idx >= sbRun.order.length){
+      markDone(subjectId, 'sentence');
+      renderCelebrate(s, 'sentence');
+      return;
+    }
+
+    var word = sbRun.order[sbRun.idx];
+    var zhFull = sentenceZh(s, word);
+    var enFull = sentenceEn(s, word);
+
+    var pieces = [
+      { id:'prefix', label:s.sentence.zhPrefix },
+      { id:'word', label:word.hanzi }
+    ];
+    if (!sbRun.bankOrder) sbRun.bankOrder = shuffle([0,1]);
+
+    var dots = sbRun.order.map(function(w,i){
+      var cls = i < sbRun.idx ? 'done' : (i === sbRun.idx ? 'current' : '');
+      return '<span class="dot '+cls+'"></span>';
+    }).join('');
+
+    var slotsHtml = sbRun.slots.map(function(pieceId, i){
+      if (pieceId === null) return '<div class="assembly-slot" data-slot="'+i+'">?</div>';
+      var piece = pieces.filter(function(p){ return p.id === pieceId; })[0];
+      return '<div class="assembly-slot filled" data-slot="'+i+'">'+escapeHtml(piece.label)+'</div>';
+    }).join('');
+
+    var bankHtml = sbRun.bankOrder.map(function(pi){
+      var piece = pieces[pi];
+      var used = sbRun.slots.indexOf(piece.id) !== -1;
+      return '<button class="word-tile'+(used?' used':'')+'" data-piece="'+piece.id+'">'+escapeHtml(piece.label)+'</button>';
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← '+escapeHtml(s.name)+'</button></div>'+
+      '<h2>Sentence Builder · '+escapeHtml(s.name)+'</h2>'+
+      '<div class="progress-dots">'+dots+'</div>'+
+      '<div class="sentence-prompt">'+
+        '<div class="sent-visual">'+visualOrTextHtml(word)+'</div>'+
+        '<button class="hear-btn" id="sbHear" type="button">🔊 Hear the sentence</button>'+
+      '</div>'+
+      '<div class="assembly-row">'+slotsHtml+'</div>'+
+      '<div class="tile-bank">'+bankHtml+'</div>'+
+      '<div class="sentence-caption" id="sbCaption"></div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ sbRun=null; go('subject', subjectId); });
+    $('#sbHear', $('#app')).addEventListener('click', function(){ speak(zhFull, 'zh-CN'); });
+
+    if (sbRun.slots[0] === null && sbRun.slots[1] === null){
+      speak(zhFull, 'zh-CN');
+    }
+
+    $all('.word-tile', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if (sbRun.locked) return;
+        var pieceId = btn.getAttribute('data-piece');
+        if (sbRun.slots.indexOf(pieceId) !== -1) return;
+        var emptyIdx = sbRun.slots.indexOf(null);
+        if (emptyIdx === -1) return;
+        sbRun.slots[emptyIdx] = pieceId;
+
+        if (sbRun.slots.indexOf(null) === -1){
+          var correct = sbRun.slots[0] === 'prefix' && sbRun.slots[1] === 'word';
+          sbRun.locked = true;
+          renderSentenceBuilder(subjectId);
+          var slotEls = $all('.assembly-slot', $('#app'));
+          if (correct){
+            slotEls.forEach(function(el){ el.classList.add('correct'); });
+            playCorrectSound();
+            speak(zhFull, 'zh-CN');
+            var cap = $('#sbCaption', $('#app'));
+            if (cap && !SETTINGS.hideEnglish) cap.textContent = enFull;
+            setTimeout(function(){
+              sbRun.idx += 1;
+              sbRun.slots = [null,null];
+              sbRun.bankOrder = null;
+              sbRun.locked = false;
+              renderSentenceBuilder(subjectId);
+            }, 1100);
+          } else {
+            slotEls.forEach(function(el){ el.classList.add('wrong'); });
+            playWrongSound();
+            setTimeout(function(){
+              sbRun.slots = [null,null];
+              sbRun.locked = false;
+              renderSentenceBuilder(subjectId);
+            }, 700);
+          }
+          return;
+        }
+        renderSentenceBuilder(subjectId);
+      });
+    });
+
+    $all('.assembly-slot', $('#app')).forEach(function(el){
+      el.addEventListener('click', function(){
+        if (sbRun.locked) return;
+        var i = parseInt(el.getAttribute('data-slot'), 10);
+        if (sbRun.slots[i] !== null){
+          sbRun.slots[i] = null;
+          renderSentenceBuilder(subjectId);
+        }
+      });
+    });
+  }
+
+  /* ============ FILL-IN-THE-BLANK ============ */
+  var fbRun = null; // { subjectId, order, idx, locked }
+
+  function startFillBlank(subjectId){
+    var s = findSubject(subjectId);
+    fbRun = { subjectId: subjectId, order: shuffle(s.words), idx:0, locked:false };
+  }
+
+  function renderFillBlank(subjectId){
+    if (!fbRun || fbRun.subjectId !== subjectId) startFillBlank(subjectId);
+    var s = findSubject(subjectId);
+
+    if (fbRun.idx >= fbRun.order.length){
+      markDone(subjectId, 'fillblank');
+      renderCelebrate(s, 'fillblank');
+      return;
+    }
+
+    var target = fbRun.order[fbRun.idx];
+    var distractors = shuffle(s.words.filter(function(w){ return w.hanzi !== target.hanzi; })).slice(0,3);
+    var choices = shuffle([target].concat(distractors));
+
+    var dots = fbRun.order.map(function(w,i){
+      var cls = i < fbRun.idx ? 'done' : (i === fbRun.idx ? 'current' : '');
+      return '<span class="dot '+cls+'"></span>';
+    }).join('');
+
+    var choiceHtml = choices.map(function(w, i){
+      return '<button class="choice-tile" data-hanzi="'+escapeHtml(w.hanzi)+'" data-i="'+i+'">'+visualOrTextHtml(w)+'</button>';
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← '+escapeHtml(s.name)+'</button></div>'+
+      '<h2>Fill-in-the-Blank · '+escapeHtml(s.name)+'</h2>'+
+      '<div class="progress-dots">'+dots+'</div>'+
+      '<button class="prompt-card" id="fbPrompt">'+
+        '<div class="hanzi">'+escapeHtml(s.sentence.zhPrefix)+'<span class="blank-mark">___</span></div>'+
+        '<div class="pinyin">'+escapeHtml(s.sentence.zhPrefixPinyin)+' ___</div>'+
+        '<div class="tap-hint">🔊 Tap to hear the sentence start</div>'+
+      '</button>'+
+      '<div class="choice-grid">'+choiceHtml+'</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ fbRun=null; go('subject', subjectId); });
+    $('#fbPrompt', $('#app')).addEventListener('click', function(){ speak(s.sentence.zhPrefix, 'zh-CN'); });
+    speak(s.sentence.zhPrefix, 'zh-CN');
+
+    $all('.choice-tile', $('#app')).forEach(function(tile){
+      tile.addEventListener('click', function(){
+        if (fbRun.locked) return;
+        var isCorrect = tile.getAttribute('data-hanzi') === target.hanzi;
+        if (isCorrect){
+          fbRun.locked = true;
+          tile.classList.add('correct');
+          playCorrectSound();
+          speak(sentenceZh(s, target), 'zh-CN');
+          setTimeout(function(){
+            fbRun.idx += 1;
+            fbRun.locked = false;
+            renderFillBlank(subjectId);
+          }, 900);
+        } else {
+          tile.classList.add('wrong');
+          playWrongSound();
+          setTimeout(function(){ tile.classList.remove('wrong'); }, 420);
+        }
+      });
+    });
+  }
+
+  /* ============ PICTURE BINGO ============ */
+  var bingoRun = null; // { subjectId, board:[words], calls:[words], calledIdx, marked:{hanzi:true} }
+
+  function startBingo(subjectId){
+    var s = findSubject(subjectId);
+    bingoRun = { subjectId: subjectId, board: shuffle(s.words), calls: shuffle(s.words), calledIdx:0, marked:{} };
+  }
+
+  function renderBingo(subjectId){
+    if (!bingoRun || bingoRun.subjectId !== subjectId) startBingo(subjectId);
+    var s = findSubject(subjectId);
+
+    var markedCount = Object.keys(bingoRun.marked).length;
+    if (markedCount === bingoRun.board.length){
+      markDone(subjectId, 'bingo');
+      renderCelebrate(s, 'bingo');
+      return;
+    }
+
+    var currentCall = bingoRun.calls[bingoRun.calledIdx];
+
+    var tilesHtml = bingoRun.board.map(function(w){
+      var marked = !!bingoRun.marked[w.hanzi];
+      return '<button class="bingo-tile'+(marked?' marked':'')+'" data-hanzi="'+escapeHtml(w.hanzi)+'">'+
+        (marked ? '<span style="font-size:30px;">✅</span>' : visualOrTextHtml(w)) +
+      '</button>';
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← '+escapeHtml(s.name)+'</button></div>'+
+      '<h2>Picture Bingo · '+escapeHtml(s.name)+'</h2>'+
+      '<div class="bingo-call-row">'+
+        '<span class="set-label">🔔 Listen, then tap the picture!</span>'+
+        '<button class="repeat-btn" id="bingoRepeat" type="button">🔊 Repeat</button>'+
+      '</div>'+
+      '<div class="stat-row"><span>Found: <b>'+markedCount+' / '+bingoRun.board.length+'</b></span></div>'+
+      '<div class="bingo-grid">'+tilesHtml+'</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ bingoRun=null; go('subject', subjectId); });
+    $('#bingoRepeat', $('#app')).addEventListener('click', function(){ speak(currentCall.hanzi, 'zh-CN'); });
+    speak(currentCall.hanzi, 'zh-CN');
+
+    $all('.bingo-tile', $('#app')).forEach(function(tile){
+      tile.addEventListener('click', function(){
+        var hanzi = tile.getAttribute('data-hanzi');
+        if (bingoRun.marked[hanzi]) return;
+        if (hanzi === currentCall.hanzi){
+          bingoRun.marked[hanzi] = true;
+          playCorrectSound();
+          speak(currentCall.hanzi + '，' + currentCall.en, 'zh-CN');
+          bingoRun.calledIdx = Math.min(bingoRun.calledIdx + 1, bingoRun.calls.length - 1);
+          setTimeout(function(){ renderBingo(subjectId); }, 700);
+        } else {
+          tile.classList.add('wrong');
+          playWrongSound();
+          setTimeout(function(){ tile.classList.remove('wrong'); }, 420);
+        }
+      });
+    });
+  }
+
+  /* ============ SOUND SORT (cross-subject) ============ */
+  var sortSelection = ['animals', 'colors'];
+  var sortRun = null; // { aId, bId, queue:[{word,subjectId}], idx }
+
+  function renderSortPicker(){
+    var canStart = sortSelection.length === 2;
+    var chips = SUBJECTS.map(function(s){
+      var sel = sortSelection.indexOf(s.id) !== -1;
+      return '<button class="sort-chip'+(sel?' selected':'')+'" data-id="'+s.id+'">'+s.icon+' '+escapeHtml(s.name)+'</button>';
+    }).join('');
+    var startDesc = canStart
+      ? ('Mix '+findSubject(sortSelection[0]).name+' + '+findSubject(sortSelection[1]).name)
+      : 'Choose exactly 2 subjects';
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Playroom</button></div>'+
+      '<h2>🔀 Sound Sort</h2>'+
+      '<div class="intro-line">Pick 2 subjects to mix together.</div>'+
+      '<div class="sort-picker-grid">'+chips+'</div>'+
+      '<button class="mode-btn" id="startSortBtn" style="--accent:var(--purple);'+(canStart?'':'opacity:.5;')+'">'+
+        '<span class="emo">▶️</span><span class="title">Start Sorting</span>'+
+        '<span class="desc">'+startDesc+'</span>'+
+      '</button>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('home'); });
+    $all('.sort-chip', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-id');
+        var pos = sortSelection.indexOf(id);
+        if (pos !== -1) sortSelection.splice(pos,1);
+        else if (sortSelection.length < 2) sortSelection.push(id);
+        renderSortPicker();
+      });
+    });
+    $('#startSortBtn', $('#app')).addEventListener('click', function(){
+      if (sortSelection.length === 2){ sortRun = null; go('soundSort'); }
+    });
+  }
+
+  function buildSortQueue(aId, bId){
+    var a = findSubject(aId), b = findSubject(bId);
+    var items = a.words.map(function(w){ return { word:w, subjectId:aId }; })
+      .concat(b.words.map(function(w){ return { word:w, subjectId:bId }; }));
+    return shuffle(items);
+  }
+  function startSort(aId, bId){
+    sortRun = { aId:aId, bId:bId, queue: buildSortQueue(aId,bId), idx:0 };
+  }
+
+  function renderSoundSort(){
+    var aId = sortSelection[0], bId = sortSelection[1];
+    if (!aId || !bId){ go('sortPicker'); return; }
+    if (!sortRun || sortRun.aId !== aId || sortRun.bId !== bId) startSort(aId, bId);
+    var a = findSubject(aId), b = findSubject(bId);
+
+    if (sortRun.idx >= sortRun.queue.length){
+      renderSortCelebrate(a, b);
+      return;
+    }
+    var current = sortRun.queue[sortRun.idx];
+    var word = current.word;
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Playroom</button></div>'+
+      '<h2>🔀 Sound Sort · '+escapeHtml(a.name)+' + '+escapeHtml(b.name)+'</h2>'+
+      '<div class="stat-row"><span>Sorted: <b>'+sortRun.idx+' / '+sortRun.queue.length+'</b></span></div>'+
+      '<button class="prompt-card" id="soundSortPrompt">'+
+        '<div class="sent-visual" style="display:flex;justify-content:center;margin-bottom:8px;">'+visualOrTextHtml(word)+'</div>'+
+        '<div class="hanzi">'+escapeHtml(word.hanzi)+'</div>'+
+        '<div class="pinyin">'+escapeHtml(word.pinyin)+'</div>'+
+        '<div class="tap-hint">🔊 Tap to hear it again</div>'+
+      '</button>'+
+      '<div class="sort-buckets">'+
+        '<button class="sort-bucket" data-id="'+a.id+'" style="--accent:var(--'+a.accent+')"><span class="b-icon">'+a.icon+'</span>'+escapeHtml(a.name)+'</button>'+
+        '<button class="sort-bucket" data-id="'+b.id+'" style="--accent:var(--'+b.accent+')"><span class="b-icon">'+b.icon+'</span>'+escapeHtml(b.name)+'</button>'+
+      '</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ sortRun=null; go('home'); });
+    $('#soundSortPrompt', $('#app')).addEventListener('click', function(){ speak(word.hanzi, 'zh-CN'); });
+    speak(word.hanzi, 'zh-CN');
+
+    $all('.sort-bucket', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var chosen = btn.getAttribute('data-id');
+        if (chosen === current.subjectId){
+          playCorrectSound();
+          speak(word.hanzi + '，' + word.en, 'zh-CN');
+          sortRun.idx += 1;
+          setTimeout(function(){ renderSoundSort(); }, 850);
+        } else {
+          btn.classList.add('wrong');
+          playWrongSound();
+          setTimeout(function(){ btn.classList.remove('wrong'); }, 420);
+        }
+      });
+    });
+  }
+
+  function renderSortCelebrate(a, b){
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Playroom</button></div>'+
+      '<div class="celebrate">'+
+        '<div class="big-emoji">🎉</div>'+
+        '<h2>All sorted!</h2>'+
+        '<p>You sorted '+escapeHtml(a.name)+' and '+escapeHtml(b.name)+' perfectly.</p>'+
+        '<div class="stars-row">⭐⭐⭐</div>'+
+        '<div class="btn-col">'+
+          '<button class="btn primary" id="sortAgainBtn">Sort Again</button>'+
+          '<button class="btn secondary" id="sortBackBtn">Back to Playroom</button>'+
+        '</div>'+
+      '</div>';
+    $('.back-btn', $('#app')).addEventListener('click', function(){ sortRun=null; go('home'); });
+    $('#sortAgainBtn', $('#app')).addEventListener('click', function(){ sortRun=null; renderSoundSort(); });
+    $('#sortBackBtn', $('#app')).addEventListener('click', function(){ sortRun=null; go('home'); });
+  }
+
+  /* ============ celebration screen (per-subject games) ============ */
   function renderCelebrate(s, mode){
-    var label = mode === 'match' ? 'Match-Up' : 'Memory';
-    var otherMode = mode === 'match' ? 'memory' : 'match';
-    var otherLabel = mode === 'match' ? 'Memory' : 'Match-Up';
+    var labels = { match:'Match-Up', memory:'Memory', sentence:'Sentence Builder', fillblank:'Fill-in-the-Blank', bingo:'Picture Bingo' };
+    var label = labels[mode] || mode;
     $('#app').innerHTML =
       '<div class="top"><button class="back-btn">← '+escapeHtml(s.name)+'</button></div>'+
       '<div class="celebrate">'+
@@ -697,7 +805,6 @@
         '<div class="stars-row">⭐⭐⭐</div>'+
         '<div class="btn-col">'+
           '<button class="btn primary" data-go="'+mode+'">Play Again</button>'+
-          '<button class="btn secondary" data-go="'+otherMode+'">Try '+otherLabel+'</button>'+
           '<button class="btn secondary" data-go="subject">Back to '+escapeHtml(s.name)+'</button>'+
         '</div>'+
       '</div>';
@@ -707,6 +814,9 @@
         var target = btn.getAttribute('data-go');
         if (target === 'match') matchRun = null;
         if (target === 'memory') memRun = null;
+        if (target === 'sentence') sbRun = null;
+        if (target === 'fillblank') fbRun = null;
+        if (target === 'bingo') bingoRun = null;
         go(target, s.id);
       });
     });
@@ -717,11 +827,43 @@
     if (STATE.view === 'subject') renderSubject(STATE.subjectId);
     else if (STATE.view === 'match') renderMatch(STATE.subjectId);
     else if (STATE.view === 'memory') renderMemory(STATE.subjectId);
+    else if (STATE.view === 'sentence') renderSentenceBuilder(STATE.subjectId);
+    else if (STATE.view === 'fillblank') renderFillBlank(STATE.subjectId);
+    else if (STATE.view === 'bingo') renderBingo(STATE.subjectId);
+    else if (STATE.view === 'sortPicker') renderSortPicker();
+    else if (STATE.view === 'soundSort') renderSoundSort();
     else renderHome();
   }
 
-  renderApp();
+  /* ============ hot-reload state carry (best effort) ============ */
+  function persistHot(){
+    try{
+      if (window.claude && window.claude.hot && typeof window.claude.hot.snapshot === 'function'){
+        window.claude.hot.snapshot(function(){ return { view: STATE.view, subjectId: STATE.subjectId }; });
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  function boot(data){
+    if (data && data.view){
+      var gameViews = ['match','memory','sentence','fillblank','bingo','soundSort','sortPicker'];
+      STATE.view = (gameViews.indexOf(data.view) !== -1) ? (data.subjectId ? 'subject' : 'home') : data.view;
+      STATE.subjectId = data.subjectId || null;
+      if (STATE.view === 'subject' && !findSubject(STATE.subjectId)) STATE.view = 'home';
+    }
+    renderApp();
+    persistHot();
+  }
+
+  try{
+    if (window.claude && window.claude.hot && window.claude.hot.ready){
+      window.claude.hot.ready(boot);
+    } else {
+      boot(window.claude && window.claude.hot ? window.claude.hot.data : null);
+    }
+  }catch(e){ boot(null); }
 })();
 </script>
+
 </body>
 </html>
