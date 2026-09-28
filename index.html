@@ -70,7 +70,7 @@
   }
   h1,h2,h3{ font-family:'Baloo 2', 'Quicksand', system-ui, sans-serif; text-wrap:balance; margin:0; }
   .hanzi{ font-family:'Noto Sans SC','Baloo 2',sans-serif; }
-  button{ font-family:inherit; }
+  button{ font-family:inherit; color:inherit; }
   a{ color:inherit; }
   .swatch{
     border:3px solid rgba(120,130,150,.28);
@@ -366,7 +366,9 @@
     display:flex; align-items:center; justify-content:center; aspect-ratio:1/1;
     box-shadow:0 3px 10px rgba(var(--shadow),0.08); transition:transform .1s ease;
   }
-  .bingo-tile .visual-img{ width:52px; height:76px; }
+  .bingo-tile .visual-img{ width:56px; height:82px; }
+  .bingo-tile .visual{ font-size:clamp(34px,9vw,54px); }
+  .bingo-tile .swatch{ width:56px; height:56px; font-size:28px; }
   .bingo-tile:hover{ transform:translateY(-2px); }
   .bingo-tile.marked{ border-color:var(--bamboo); background:color-mix(in srgb, var(--bamboo) 18%, var(--surface)); cursor:default; }
   .bingo-tile.wrong{ animation:shake .4s ease; border-color:var(--coral); }
