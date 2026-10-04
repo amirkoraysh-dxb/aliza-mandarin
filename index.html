@@ -419,6 +419,93 @@
     .write-info .visual-img{ width:60px; height:90px; }
   }
 
+  /* ---------- sentences section ---------- */
+  .sent-banner{
+    display:flex; align-items:center; gap:16px; width:100%; text-align:left; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--sky), color-mix(in srgb, var(--sky) 65%, #000 14%));
+    color:#fff; border-radius:24px; padding:20px 22px; margin-bottom:22px;
+    box-shadow:0 8px 0 color-mix(in srgb, var(--sky) 55%, #000 25%);
+    transition:transform .12s ease;
+  }
+  .sent-banner:hover{ transform:translateY(-2px); }
+  .sent-banner:active{ transform:translateY(2px); }
+  .sent-banner .ss-icon{ font-size:38px; flex:none; }
+  .sent-banner .ss-title{ font-family:'Baloo 2',sans-serif; font-size:20px; font-weight:800; }
+  .sent-banner .ss-desc{ font-size:14px; opacity:.95; font-weight:600; }
+  .scope-row{ display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+  .scope-chip{
+    border:3px solid transparent; border-radius:999px; padding:9px 16px; font-weight:800; font-size:14px; cursor:pointer;
+    background:var(--surface); color:var(--ink); box-shadow:0 2px 8px rgba(var(--shadow),0.10);
+  }
+  .scope-chip.selected{ border-color:var(--sky); background:color-mix(in srgb, var(--sky) 20%, var(--surface)); }
+  .sent-progress{ color:var(--ink-soft); font-weight:700; font-size:15px; margin:0 0 18px; }
+  .sent-progress b{ color:var(--ink); }
+  .sent-group{ font-family:'Baloo 2',sans-serif; font-size:18px; font-weight:800; margin:22px 0 10px; color:var(--ink); }
+  .sent-card{
+    display:flex; align-items:center; gap:14px; width:100%; text-align:left; border:none; cursor:pointer;
+    background:var(--surface); color:var(--ink); border-radius:20px; padding:14px 16px; margin-bottom:10px;
+    box-shadow:0 3px 12px rgba(var(--shadow),0.08);
+  }
+  .sent-card:active{ transform:scale(.99); }
+  .sent-card .sc-emoji{ font-size:32px; flex:none; width:44px; text-align:center; }
+  .sent-card .sc-text{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .sent-card .hanzi{ font-size:24px; font-weight:700; color:var(--ink); }
+  .sent-card .pinyin{ font-size:14px; font-weight:700; color:var(--ink-soft); }
+  .sent-card .en{ font-size:14px; color:var(--ink-soft); }
+  .sent-card .sc-mark{ font-size:20px; flex:none; }
+
+  .say-card{
+    background:var(--surface); color:var(--ink); border:none; border-radius:28px; padding:30px 20px; text-align:center;
+    margin-bottom:20px; box-shadow:0 3px 16px rgba(var(--shadow),0.10); width:100%; display:block;
+  }
+  button.say-card{ cursor:pointer; }
+  .say-emoji{ font-size:72px; line-height:1.1; margin-bottom:8px; }
+  .say-en{ font-size:26px; font-weight:800; color:var(--ink); }
+  .say-en.small{ font-size:16px; color:var(--ink-soft); margin:6px 0 12px; font-weight:700; }
+  .say-hint{ color:var(--ink-soft); font-weight:700; margin-top:10px; font-size:15px; }
+  .say-hanzi{ font-size:44px; font-weight:700; color:var(--ink); line-height:1.3; }
+  .say-pinyin{ font-size:20px; font-weight:700; color:var(--ink-soft); margin-top:4px; }
+  .say-actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .say-btn{
+    border:none; border-radius:999px; padding:14px 26px; font-weight:800; font-size:17px; cursor:pointer; color:#fff;
+    font-family:'Baloo 2',sans-serif;
+  }
+  .say-btn.main{ background:var(--coral); box-shadow:0 5px 0 color-mix(in srgb, var(--coral) 55%, #000 25%); }
+  .say-btn.again{ background:color-mix(in srgb, var(--sky) 20%, var(--surface)); color:var(--ink); box-shadow:0 5px 0 rgba(var(--shadow),0.15); }
+  .pick-reveal{ min-height:34px; margin:6px 0 10px; text-align:center; font-weight:700; }
+  .pick-reveal .hanzi{ font-size:26px; color:var(--ink); }
+  .pick-reveal .pinyin{ font-size:16px; color:var(--ink-soft); }
+  .pick-choices{ display:grid; gap:12px; }
+  .pick-choice{
+    display:flex; align-items:center; gap:14px; border:3px solid transparent; border-radius:20px; padding:16px 18px;
+    background:var(--surface); color:var(--ink); font-size:18px; font-weight:800; cursor:pointer; text-align:left;
+    box-shadow:0 3px 12px rgba(var(--shadow),0.08);
+  }
+  .pick-choice .pc-emoji{ font-size:30px; }
+  .pick-choice.right{ border-color:var(--bamboo); background:color-mix(in srgb, var(--bamboo) 22%, var(--surface)); }
+  .pick-choice.wrong{ border-color:var(--coral); opacity:.6; }
+  .sent-slots{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:6px 0 22px; }
+  .sent-slot{
+    min-width:64px; min-height:62px; border-radius:16px; border:3px dashed color-mix(in srgb, var(--ink-soft) 45%, transparent);
+    display:flex; align-items:center; justify-content:center; padding:6px 12px; font-size:28px; font-weight:700; color:var(--ink);
+  }
+  .sent-slot.filled{ border-style:solid; border-color:var(--bamboo); background:color-mix(in srgb, var(--bamboo) 18%, var(--surface)); }
+  .sent-tiles{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .sent-tile{
+    border:none; border-radius:16px; padding:14px 20px; font-size:28px; font-weight:700; cursor:pointer;
+    background:var(--surface); color:var(--ink); box-shadow:0 5px 0 rgba(var(--shadow),0.15), 0 2px 10px rgba(var(--shadow),0.10);
+  }
+  .sent-tile.used{ visibility:hidden; }
+  .sent-tile.wiggle{ animation:sentWiggle .35s; }
+  @keyframes sentWiggle{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
+  .speech-form{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; margin-bottom:18px; }
+  .speech-form label{ display:flex; flex-direction:column; gap:6px; font-weight:800; font-size:14px; color:var(--ink-soft); }
+  .speech-form input, .speech-form select{
+    font:inherit; font-size:16px; font-weight:700; color:var(--ink); background:var(--surface);
+    border:2px solid color-mix(in srgb, var(--ink-soft) 40%, transparent); border-radius:14px; padding:11px 12px; width:100%;
+  }
+  .speech-form option{ color:var(--ink); background:var(--surface); }
+
   /* ---------- sound sort ---------- */
   .sort-buckets{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
   .sort-bucket{
@@ -516,7 +603,7 @@
     },
     {
       id: 'fruits', name: 'Fruits', icon: '🍎', accent: 'coral',
-      sentence: { zhPrefix:'我喜欢', zhPrefixPinyin:'Wǒ xǐhuān', zhSuffix:'。', enPrefix:'I like ', enSuffix:'.' },
+      sentence: { zhPrefix:'我爱吃', zhPrefixPinyin:'Wǒ ài chī', zhSuffix:'。', enPrefix:'I love to eat ', enSuffix:'.' },
       words: [
         { en:'Apple', hanzi:'苹果', pinyin:'píngguǒ', emoji:'🍎' },
         { en:'Banana', hanzi:'香蕉', pinyin:'xiāngjiāo', emoji:'🍌' },
@@ -535,7 +622,12 @@
         { en:'Potato', hanzi:'土豆', pinyin:'tǔdòu', emoji:'🥔' },
         { en:'Cucumber', hanzi:'黄瓜', pinyin:'huángguā', emoji:'🥒' },
         { en:'Chili', hanzi:'辣椒', pinyin:'làjiāo', emoji:'🌶️' },
-        { en:'Tomato', hanzi:'西红柿', pinyin:'xīhóngshì', emoji:'🍅' }
+        { en:'Tomato', hanzi:'西红柿', pinyin:'xīhóngshì', emoji:'🍅' },
+        { en:'Corn', hanzi:'玉米', pinyin:'yùmǐ', emoji:'🌽' },
+        { en:'Chinese cabbage', hanzi:'大白菜', pinyin:'dàbáicài', emoji:'🥬' },
+        { en:'Broccoli', hanzi:'西兰花', pinyin:'xīlánhuā', emoji:'🥦' },
+        { en:'Carrot', hanzi:'胡萝卜', pinyin:'húluóbo', emoji:'🥕' },
+        { en:'Eggplant', hanzi:'茄子', pinyin:'qiézi', emoji:'🍆' }
       ]
     },
     {
@@ -546,7 +638,11 @@
         { en:'Sandwich', hanzi:'三明治', pinyin:'sānmíngzhì', emoji:'🥪' },
         { en:'Fries', hanzi:'薯条', pinyin:'shǔtiáo', emoji:'🍟' },
         { en:'Pizza', hanzi:'披萨饼', pinyin:'pīsàbǐng', emoji:'🍕' },
-        { en:'Chicken nuggets', hanzi:'鸡块', pinyin:'jīkuài', emoji:'🍗' }
+        { en:'Chicken nuggets', hanzi:'鸡块', pinyin:'jīkuài', emoji:'🍗' },
+        { en:'Bread', hanzi:'面包', pinyin:'miànbāo', emoji:'🍞' },
+        { en:'Cake', hanzi:'蛋糕', pinyin:'dàngāo', emoji:'🍰' },
+        { en:'Cookie', hanzi:'饼干', pinyin:'bǐnggān', emoji:'🍪' },
+        { en:'Ice cream', hanzi:'冰淇淋', pinyin:'bīngqílín', emoji:'🍦' }
       ]
     },
     {
@@ -788,6 +884,10 @@
         '<span class="ss-icon">🔀</span>'+
         '<div><div class="ss-title">Sound Sort</div><div class="ss-desc">Mix two subjects and sort pictures by sound</div></div>'+
       '</button>'+
+      '<button class="sent-banner" id="sentBtn">'+
+        '<span class="ss-icon">💬</span>'+
+        '<div><div class="ss-title">Sentences</div><div class="ss-desc">Learn hello, thank you, sorry and more by heart</div></div>'+
+      '</button>'+
       '<button class="songs-banner" id="songsBtn">'+
         '<span class="ss-icon">🎵</span>'+
         '<div><div class="ss-title">Songs</div><div class="ss-desc">Sing along, line by line</div></div>'+
@@ -798,6 +898,7 @@
       btn.addEventListener('click', function(){ go('subject', btn.getAttribute('data-subject')); });
     });
     $('#soundSortBtn', $('#app')).addEventListener('click', function(){ go('sortPicker'); });
+    $('#sentBtn', $('#app')).addEventListener('click', function(){ go('sentences'); });
     $('#songsBtn', $('#app')).addEventListener('click', function(){ go('songs'); });
   }
 
@@ -1820,6 +1921,346 @@
     }catch(e){ /* speech not available — fail silently */ }
   }
 
+  /* ============ SENTENCES ============
+     Everyday sentences from the class sheets (greetings, names, manners) plus the "I love to eat ..." sentences
+     that are generated automatically from the Fruits, Vegetables and Food word lists.
+     `parts` are the tiles used by the Build It game and must join back into `hanzi`.
+  */
+  var PHRASES = [
+    { id:'hello',     group:'Greetings',     emoji:'👋', hanzi:'你好！',       pinyin:'Nǐ hǎo!',            en:'Hello!',                 parts:['你','好','！'] },
+    { id:'hello-t',   group:'Greetings',     emoji:'🧑‍🏫', hanzi:'老师好！',     pinyin:'Lǎoshī hǎo!',        en:'Hello, teacher!',        parts:['老师','好','！'] },
+    { id:'morning',   group:'Greetings',     emoji:'🌅', hanzi:'你早！',       pinyin:'Nǐ zǎo!',            en:'Good morning!',          parts:['你','早','！'] },
+    { id:'morning-t', group:'Greetings',     emoji:'☀️', hanzi:'老师早！',     pinyin:'Lǎoshī zǎo!',        en:'Good morning, teacher!', parts:['老师','早','！'] },
+    { id:'everyone',  group:'Greetings',     emoji:'🙌', hanzi:'大家好！',     pinyin:'Dàjiā hǎo!',         en:'Hello, everyone!',       parts:['大家','好','！'] },
+    { id:'name-q',    group:'Name and age',  emoji:'🏷️', hanzi:'你叫什么名字？', pinyin:'Nǐ jiào shénme míngzi?', en:'What is your name?',  parts:['你','叫','什么','名字','？'] },
+    { id:'name-a',    group:'Name and age',  emoji:'🙋', hanzi:'我叫大卫。',   pinyin:'Wǒ jiào Dàwèi.',     en:'My name is David.',      parts:['我','叫','大卫','。'] },
+    { id:'age-q',     group:'Name and age',  emoji:'🎂', hanzi:'你几岁？',     pinyin:'Nǐ jǐ suì?',         en:'How old are you?',       parts:['你','几','岁','？'] },
+    { id:'age-a',     group:'Name and age',  emoji:'🖐️', hanzi:'我四岁。',     pinyin:'Wǒ sì suì.',         en:'I am four years old.',   parts:['我','四','岁','。'] },
+    { id:'thanks',    group:'Good manners',  emoji:'🙏', hanzi:'谢谢你！',     pinyin:'Xièxie nǐ!',         en:'Thank you!',             parts:['谢谢','你','！'] },
+    { id:'thanks2',   group:'Good manners',  emoji:'😊', hanzi:'谢谢！',       pinyin:'Xièxie!',            en:'Thanks!',                parts:['谢','谢','！'] },
+    { id:'welcome',   group:'Good manners',  emoji:'🤗', hanzi:'不客气！',     pinyin:'Bú kèqi!',           en:'You are welcome!',       parts:['不','客气','！'] },
+    { id:'sorry',     group:'Good manners',  emoji:'😔', hanzi:'对不起！',     pinyin:'Duìbuqǐ!',           en:'I am sorry!',            parts:['对','不','起','！'] },
+    { id:'nevermind', group:'Good manners',  emoji:'👍', hanzi:'没关系！',     pinyin:'Méi guānxi!',        en:'Never mind! It is OK!',  parts:['没','关系','！'] },
+    { id:'buying',    group:'From the song', emoji:'🛒', hanzi:'你买什么？',   pinyin:'Nǐ mǎi shénme?',     en:'What are you buying?',   parts:['你','买','什么','？'] }
+  ];
+  var SENT_MEM_KEY = 'mandarin-playroom-memorized-v1';
+  function loadMemorized(){
+    try{ var raw = window.localStorage.getItem(SENT_MEM_KEY); return raw ? JSON.parse(raw) : {}; }catch(e){ return {}; }
+  }
+  function saveMemorized(m){
+    try{ window.localStorage.setItem(SENT_MEM_KEY, JSON.stringify(m)); }catch(e){ /* ignore */ }
+  }
+  function foodSentences(){
+    var out = [];
+    ['fruits','vegetables','food'].forEach(function(sid){
+      var s = findSubject(sid); if (!s) return;
+      s.words.forEach(function(w){
+        var pre = s.sentence.zhPrefix;
+        var parts = (pre.charAt(0) === '我') ? ['我', pre.slice(1), w.hanzi, '。'] : [pre, w.hanzi, '。'];
+        var en = sentenceEn(s, w); en = en.charAt(0).toUpperCase() + en.slice(1);
+        out.push({
+          id:'eat-' + sid + '-' + w.hanzi, group:'I love to eat · ' + s.name, emoji:w.emoji,
+          hanzi:sentenceZh(s, w), pinyin:s.sentence.zhPrefixPinyin + ' ' + w.pinyin + '.', en:en, parts:parts
+        });
+      });
+    });
+    return out;
+  }
+  var sentScope = 'talk';
+  function sentPool(){
+    if (sentScope === 'eat') return foodSentences();
+    if (sentScope === 'all') return PHRASES.concat(foodSentences());
+    return PHRASES.slice();
+  }
+  function sentById(id){
+    var all = PHRASES.concat(foodSentences());
+    for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
+    return null;
+  }
+  var sayRun = null, pickRun = null, buildRun = null;
+
+  function renderSentences(){
+    var pool = sentPool(), mem = loadMemorized();
+    var known = pool.filter(function(p){ return mem[p.id]; }).length;
+    var scopes = [['talk','💬 Everyday'], ['eat','🍽️ I love to eat…'], ['all','⭐ All']];
+    var chips = scopes.map(function(sc){
+      return '<button class="scope-chip' + (sentScope === sc[0] ? ' selected' : '') + '" data-scope="' + sc[0] + '">' + sc[1] + '</button>';
+    }).join('');
+    var lastGroup = null, list = '';
+    pool.forEach(function(p){
+      if (p.group !== lastGroup){ list += '<h3 class="sent-group">' + escapeHtml(p.group) + '</h3>'; lastGroup = p.group; }
+      list += '<button class="sent-card" data-id="' + escapeHtml(p.id) + '">' +
+        '<span class="sc-emoji">' + p.emoji + '</span>' +
+        '<span class="sc-text"><span class="hanzi">' + escapeHtml(p.hanzi) + '</span>' +
+        '<span class="pinyin">' + escapeHtml(p.pinyin) + '</span>' +
+        '<span class="en">' + escapeHtml(p.en) + '</span></span>' +
+        '<span class="sc-mark">' + (mem[p.id] ? '✅' : '🔊') + '</span></button>';
+    });
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Playroom</button></div>' +
+      '<h2>💬 Sentences</h2>' +
+      '<div class="intro-line">Learn whole sentences by heart. Tap a sentence to hear it.</div>' +
+      '<div class="scope-row">' + chips + '</div>' +
+      '<div class="sent-progress">✅ Learned by heart: <b>' + known + ' / ' + pool.length + '</b></div>' +
+      '<div class="mode-row">' +
+        '<button class="mode-btn" data-sgame="say" style="--accent:var(--coral)"><span class="emo">🗣️</span><span class="title">Say It</span><span class="desc">See the picture, say it in Chinese, then check</span></button>' +
+        '<button class="mode-btn" data-sgame="pick" style="--accent:var(--sky)"><span class="emo">👂</span><span class="title">Listen &amp; Pick</span><span class="desc">Hear a sentence, pick what it means</span></button>' +
+        '<button class="mode-btn" data-sgame="build" style="--accent:var(--sun)"><span class="emo">🧱</span><span class="title">Build It</span><span class="desc">Put the words in the right order</span></button>' +
+        '<button class="mode-btn" data-sgame="speech" style="--accent:var(--purple)"><span class="emo">🎤</span><span class="title">My Speech</span><span class="desc">Make and practise your own speech</span></button>' +
+      '</div>' +
+      '<div class="sent-list">' + list + '</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('home'); });
+    $all('.scope-chip', $('#app')).forEach(function(b){
+      b.addEventListener('click', function(){ sentScope = b.getAttribute('data-scope'); renderSentences(); });
+    });
+    $all('.sent-card', $('#app')).forEach(function(b){
+      b.addEventListener('click', function(){ var p = sentById(b.getAttribute('data-id')); if (p) speak(p.hanzi, 'zh-CN'); });
+    });
+    $all('[data-sgame]', $('#app')).forEach(function(b){
+      b.addEventListener('click', function(){
+        var g = b.getAttribute('data-sgame');
+        if (g === 'say'){ sayRun = null; go('sentSay'); }
+        else if (g === 'pick'){ pickRun = null; go('sentPick'); }
+        else if (g === 'build'){ buildRun = null; go('sentBuild'); }
+        else go('speech');
+      });
+    });
+  }
+
+  function renderSentCelebrate(title, replayView){
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Sentences</button></div>' +
+      '<div class="celebrate"><div class="big-emoji">🎉</div><h2>Great job!</h2>' +
+      '<p>You finished ' + escapeHtml(title) + '.</p><div class="stars-row">⭐⭐⭐</div>' +
+      '<div class="btn-col"><button class="btn primary" id="sentAgain">Play Again</button>' +
+      '<button class="btn secondary" id="sentBack">Back to Sentences</button></div></div>';
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('sentences'); });
+    $('#sentBack', $('#app')).addEventListener('click', function(){ go('sentences'); });
+    $('#sentAgain', $('#app')).addEventListener('click', function(){
+      sayRun = null; pickRun = null; buildRun = null; go(replayView);
+    });
+  }
+
+  /* ---- Say It: picture + English first, then reveal the Chinese ---- */
+  function renderSentSay(){
+    if (!sayRun){
+      var ids = shuffle(sentPool()).slice(0, 10).map(function(p){ return p.id; });
+      sayRun = { queue: ids, total: ids.length, learned: 0, shown: false };
+    }
+    if (!sayRun.queue.length){ renderSentCelebrate('Say It', 'sentSay'); return; }
+    var p = sentById(sayRun.queue[0]);
+    var dots = '';
+    for (var i = 0; i < sayRun.total; i++) dots += '<span class="dot' + (i < sayRun.learned ? ' done' : (i === sayRun.learned ? ' current' : '')) + '"></span>';
+    var body;
+    if (!sayRun.shown){
+      body =
+        '<div class="say-card"><div class="say-emoji">' + p.emoji + '</div>' +
+        '<div class="say-en">' + escapeHtml(p.en) + '</div>' +
+        '<div class="say-hint">How do you say this in Chinese? Say it out loud!</div></div>' +
+        '<div class="say-actions"><button class="say-btn main" id="sayShow">👀 Show me</button></div>';
+    } else {
+      body =
+        '<div class="say-card revealed"><div class="say-emoji">' + p.emoji + '</div>' +
+        '<div class="say-hanzi">' + escapeHtml(p.hanzi) + '</div>' +
+        '<div class="say-pinyin">' + escapeHtml(p.pinyin) + '</div>' +
+        '<div class="say-en small">' + escapeHtml(p.en) + '</div>' +
+        '<button class="hear-btn" id="sayHear">🔊 Hear it</button></div>' +
+        '<div class="say-actions"><button class="say-btn again" id="sayAgain">🔁 Again</button>' +
+        '<button class="say-btn main" id="sayGot">✅ I said it!</button></div>';
+    }
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Sentences</button></div>' +
+      '<h2>Say It</h2><div class="progress-dots">' + dots + '</div>' + body;
+    $('.back-btn', $('#app')).addEventListener('click', function(){ sayRun = null; go('sentences'); });
+    if (!sayRun.shown){
+      $('#sayShow', $('#app')).addEventListener('click', function(){ sayRun.shown = true; renderSentSay(); });
+    } else {
+      speak(p.hanzi, 'zh-CN');
+      $('#sayHear', $('#app')).addEventListener('click', function(){ speak(p.hanzi, 'zh-CN'); });
+      $('#sayAgain', $('#app')).addEventListener('click', function(){
+        sayRun.queue.push(sayRun.queue.shift()); sayRun.shown = false; renderSentSay();
+      });
+      $('#sayGot', $('#app')).addEventListener('click', function(){
+        playCorrectSound();
+        var m = loadMemorized(); m[p.id] = true; saveMemorized(m);
+        sayRun.queue.shift(); sayRun.learned += 1; sayRun.shown = false; renderSentSay();
+      });
+    }
+  }
+
+  /* ---- Listen & Pick: hear the Chinese, choose the meaning ---- */
+  function renderSentPick(){
+    var pool = sentPool();
+    if (!pickRun){
+      pickRun = { ids: shuffle(pool).slice(0, 8).map(function(p){ return p.id; }), idx: 0, locked: false };
+    }
+    if (pickRun.idx >= pickRun.ids.length){ renderSentCelebrate('Listen & Pick', 'sentPick'); return; }
+    var p = sentById(pickRun.ids[pickRun.idx]);
+    var others = shuffle(pool.filter(function(o){ return o.id !== p.id && o.en !== p.en; })).slice(0, 2);
+    var opts = shuffle([p].concat(others));
+    var dots = '';
+    for (var i = 0; i < pickRun.ids.length; i++) dots += '<span class="dot' + (i < pickRun.idx ? ' done' : (i === pickRun.idx ? ' current' : '')) + '"></span>';
+    var choiceHtml = opts.map(function(o){
+      return '<button class="pick-choice" data-id="' + escapeHtml(o.id) + '"><span class="pc-emoji">' + o.emoji + '</span><span>' + escapeHtml(o.en) + '</span></button>';
+    }).join('');
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Sentences</button></div>' +
+      '<h2>Listen &amp; Pick</h2><div class="progress-dots">' + dots + '</div>' +
+      '<button class="say-card listen" id="pickHear"><div class="say-emoji">👂</div><div class="say-hint">Tap to hear the sentence</div></button>' +
+      '<div class="pick-reveal" id="pickReveal"></div>' +
+      '<div class="pick-choices">' + choiceHtml + '</div>';
+    pickRun.locked = false;
+    $('.back-btn', $('#app')).addEventListener('click', function(){ pickRun = null; go('sentences'); });
+    $('#pickHear', $('#app')).addEventListener('click', function(){ speak(p.hanzi, 'zh-CN'); });
+    setTimeout(function(){ if (pickRun && pickRun.ids[pickRun.idx] === p.id && document.getElementById('pickHear')) speak(p.hanzi, 'zh-CN'); }, 350);
+    $all('.pick-choice', $('#app')).forEach(function(b){
+      b.addEventListener('click', function(){
+        if (pickRun.locked) return;
+        if (b.getAttribute('data-id') === p.id){
+          pickRun.locked = true;
+          b.classList.add('right'); playCorrectSound();
+          $('#pickReveal', $('#app')).innerHTML = '<span class="hanzi">' + escapeHtml(p.hanzi) + '</span> <span class="pinyin">' + escapeHtml(p.pinyin) + '</span>';
+          setTimeout(function(){ pickRun.idx += 1; renderSentPick(); }, 1300);
+        } else {
+          b.classList.add('wrong'); playWrongSound();
+        }
+      });
+    });
+  }
+
+  /* ---- Build It: tap the words in the right order ---- */
+  function renderSentBuild(){
+    var pool = sentPool();
+    if (!buildRun){
+      buildRun = { ids: shuffle(pool).slice(0, 6).map(function(p){ return p.id; }), idx: 0, placed: 0, used: null, done: false };
+    }
+    if (buildRun.idx >= buildRun.ids.length){ renderSentCelebrate('Build It', 'sentBuild'); return; }
+    var p = sentById(buildRun.ids[buildRun.idx]);
+    if (!buildRun.tiles || buildRun.tilesFor !== p.id){
+      buildRun.tiles = shuffle(p.parts.map(function(t, i){ return { t:t, k:i }; }));
+      buildRun.tilesFor = p.id; buildRun.placed = 0; buildRun.used = {}; buildRun.done = false;
+    }
+    var dots = '';
+    for (var i = 0; i < buildRun.ids.length; i++) dots += '<span class="dot' + (i < buildRun.idx ? ' done' : (i === buildRun.idx ? ' current' : '')) + '"></span>';
+    var slots = p.parts.map(function(t, i){
+      return '<span class="sent-slot' + (i < buildRun.placed ? ' filled' : '') + '">' + (i < buildRun.placed ? escapeHtml(t) : '') + '</span>';
+    }).join('');
+    var tiles = buildRun.tiles.map(function(tile){
+      return '<button class="sent-tile' + (buildRun.used[tile.k] ? ' used' : '') + '" data-k="' + tile.k + '">' + escapeHtml(tile.t) + '</button>';
+    }).join('');
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Sentences</button></div>' +
+      '<h2>Build It</h2><div class="progress-dots">' + dots + '</div>' +
+      '<div class="say-card"><div class="say-emoji">' + p.emoji + '</div><div class="say-en">' + escapeHtml(p.en) + '</div>' +
+      '<button class="hear-btn" id="buildHear">🔊 Hear it</button>' +
+      '<div class="pick-reveal">' + (buildRun.done ? '<span class="pinyin">' + escapeHtml(p.pinyin) + '</span>' : '') + '</div></div>' +
+      '<div class="sent-slots">' + slots + '</div>' +
+      '<div class="sent-tiles">' + tiles + '</div>';
+    $('.back-btn', $('#app')).addEventListener('click', function(){ buildRun = null; go('sentences'); });
+    $('#buildHear', $('#app')).addEventListener('click', function(){ speak(p.hanzi, 'zh-CN'); });
+    $all('.sent-tile', $('#app')).forEach(function(b){
+      b.addEventListener('click', function(){
+        if (buildRun.done) return;
+        var k = parseInt(b.getAttribute('data-k'), 10);
+        if (buildRun.used[k]) return;
+        var tile = buildRun.tiles.filter(function(x){ return x.k === k; })[0];
+        if (tile.t === p.parts[buildRun.placed]){
+          buildRun.used[k] = true; buildRun.placed += 1;
+          if (buildRun.placed >= p.parts.length){
+            buildRun.done = true; playCorrectSound(); speak(p.hanzi, 'zh-CN');
+            renderSentBuildNoReset();
+            setTimeout(function(){ if (buildRun){ buildRun.idx += 1; buildRun.tilesFor = null; renderSentBuild(); } }, 1700);
+          } else { renderSentBuildNoReset(); }
+        } else {
+          playWrongSound(); b.classList.add('wiggle');
+          setTimeout(function(){ b.classList.remove('wiggle'); }, 400);
+        }
+      });
+    });
+  }
+  function renderSentBuildNoReset(){ renderSentBuild(); }
+
+  /* ---- My Speech: fill in the blanks from the class speech sheet ---- */
+  var SPEECH_KEY = 'mandarin-playroom-speech-v1';
+  var AGE_ZH = { '2':['二','èr'], '3':['三','sān'], '4':['四','sì'], '5':['五','wǔ'], '6':['六','liù'], '7':['七','qī'], '8':['八','bā'], '9':['九','jiǔ'], '10':['十','shí'] };
+  function loadSpeech(){
+    try{ var raw = window.localStorage.getItem(SPEECH_KEY); if (raw) return JSON.parse(raw); }catch(e){ /* ignore */ }
+    return { name:'', age:'5', me:'', dad:'', mom:'', sis:'' };
+  }
+  function saveSpeech(d){ try{ window.localStorage.setItem(SPEECH_KEY, JSON.stringify(d)); }catch(e){ /* ignore */ } }
+  function speechFoods(){
+    var out = [];
+    ['fruits','vegetables','food'].forEach(function(sid){
+      var s = findSubject(sid); if (s) s.words.forEach(function(w){ out.push(w); });
+    });
+    return out;
+  }
+  function foodByHanzi(h){
+    var all = speechFoods();
+    for (var i = 0; i < all.length; i++) if (all[i].hanzi === h) return all[i];
+    return null;
+  }
+  function speechLines(d){
+    var nm = (d.name || '').trim(), age = AGE_ZH[d.age] || AGE_ZH['5'];
+    var lines = [
+      { emoji:'👋', hanzi:'大家好！', pinyin:'Dàjiā hǎo!', en:'Hello, everyone!' },
+      { emoji:'🙋', hanzi:'我叫' + (nm || '＿＿＿') + '。', pinyin:'Wǒ jiào ' + (nm || '___') + '.', en:'My name is ' + (nm || '___') + '.' },
+      { emoji:'🎂', hanzi:'我' + age[0] + '岁。', pinyin:'Wǒ ' + age[1] + ' suì.', en:'I am ' + d.age + ' years old.' }
+    ];
+    [['me','我爱吃','Wǒ ài chī','I love to eat ','😋'], ['dad','我爸爸爱吃','Wǒ bàba ài chī','My dad loves to eat ','👨'],
+     ['mom','我妈妈爱吃','Wǒ māma ài chī','My mom loves to eat ','👩'], ['sis','我姐姐爱吃','Wǒ jiějie ài chī','My sister loves to eat ','👧']].forEach(function(r){
+      var w = foodByHanzi(d[r[0]]);
+      if (w) lines.push({ emoji:r[4], hanzi:r[1] + w.hanzi + '。', pinyin:r[2] + ' ' + w.pinyin + '.', en:r[3] + w.en.toLowerCase() + '.' });
+    });
+    lines.push({ emoji:'🙏', hanzi:'谢谢！', pinyin:'Xièxie!', en:'Thank you!' });
+    return lines;
+  }
+  function renderSpeech(){
+    var d = loadSpeech();
+    var foodOpts = '<option value="">— skip —</option>' + speechFoods().map(function(w){
+      return '<option value="' + escapeHtml(w.hanzi) + '">' + (w.emoji || '') + ' ' + escapeHtml(w.hanzi) + ' · ' + escapeHtml(w.en) + '</option>';
+    }).join('');
+    var ageOpts = Object.keys(AGE_ZH).map(function(a){ return '<option value="' + a + '">' + a + ' · ' + AGE_ZH[a][0] + '岁</option>'; }).join('');
+    function foodSel(id, label){ return '<label>' + label + '<select id="sp_' + id + '">' + foodOpts + '</select></label>'; }
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← Sentences</button></div>' +
+      '<h2>🎤 My Speech</h2>' +
+      '<div class="intro-line">Fill in the blanks, then practise your speech out loud.</div>' +
+      '<div class="speech-form">' +
+        '<label>My name is<input id="sp_name" type="text" maxlength="20" placeholder="type a name"></label>' +
+        '<label>I am … years old<select id="sp_age">' + ageOpts + '</select></label>' +
+        foodSel('me', 'I love to eat') + foodSel('dad', 'My dad loves to eat') +
+        foodSel('mom', 'My mom loves to eat') + foodSel('sis', 'My sister loves to eat') +
+      '</div>' +
+      '<button class="sing-all-btn" id="speechAll" type="button">▶️ Read my whole speech</button>' +
+      '<div id="speechLines"></div>';
+    $('.back-btn', $('#app')).addEventListener('click', function(){ go('sentences'); });
+    $('#sp_name', $('#app')).value = d.name || '';
+    $('#sp_age', $('#app')).value = d.age || '5';
+    ['me','dad','mom','sis'].forEach(function(k){ $('#sp_' + k, $('#app')).value = d[k] || ''; });
+    function refresh(){
+      d.name = $('#sp_name', $('#app')).value; d.age = $('#sp_age', $('#app')).value;
+      ['me','dad','mom','sis'].forEach(function(k){ d[k] = $('#sp_' + k, $('#app')).value; });
+      saveSpeech(d);
+      var lines = speechLines(d);
+      $('#speechLines', $('#app')).innerHTML = lines.map(function(l, i){
+        return '<button class="song-line" data-i="' + i + '"><div class="hanzi">' + l.emoji + ' ' + escapeHtml(l.hanzi) + '</div>' +
+          '<div class="pinyin">' + escapeHtml(l.pinyin) + '</div><div class="en">' + escapeHtml(l.en) + '</div></button>';
+      }).join('');
+      $all('#speechLines .song-line', $('#app')).forEach(function(b){
+        b.addEventListener('click', function(){ speak(lines[parseInt(b.getAttribute('data-i'), 10)].hanzi, 'zh-CN'); });
+      });
+      return lines;
+    }
+    var current = refresh();
+    ['sp_name','sp_age','sp_me','sp_dad','sp_mom','sp_sis'].forEach(function(id){
+      var el = $('#' + id, $('#app'));
+      el.addEventListener(id === 'sp_name' ? 'input' : 'change', function(){ current = refresh(); });
+    });
+    $('#speechAll', $('#app')).addEventListener('click', function(){ singSongLines(current, 0); });
+  }
+
   /* ============ celebration screen (per-subject games) ============ */
   function renderCelebrate(s, mode){
     var labels = { match:'Match-Up', memory:'Memory', sentence:'Sentence Builder', fillblank:'Fill-in-the-Blank', bingo:'Picture Bingo' };
@@ -1861,6 +2302,11 @@
     else if (STATE.view === 'write') renderWrite(STATE.subjectId);
     else if (STATE.view === 'sortPicker') renderSortPicker();
     else if (STATE.view === 'soundSort') renderSoundSort();
+    else if (STATE.view === 'sentences') renderSentences();
+    else if (STATE.view === 'sentSay') renderSentSay();
+    else if (STATE.view === 'sentPick') renderSentPick();
+    else if (STATE.view === 'sentBuild') renderSentBuild();
+    else if (STATE.view === 'speech') renderSpeech();
     else if (STATE.view === 'songs') renderSongs();
     else if (STATE.view === 'songDetail') renderSongDetail(STATE.subjectId);
     else renderHome();
@@ -1877,7 +2323,7 @@
 
   function boot(data){
     if (data && data.view){
-      var gameViews = ['match','memory','sentence','fillblank','bingo','write','soundSort','sortPicker'];
+      var gameViews = ['match','memory','sentence','fillblank','bingo','write','soundSort','sortPicker','sentSay','sentPick','sentBuild'];
       STATE.view = (gameViews.indexOf(data.view) !== -1) ? (data.subjectId ? 'subject' : 'home') : data.view;
       STATE.subjectId = data.subjectId || null;
       if (STATE.view === 'subject' && !findSubject(STATE.subjectId)) STATE.view = 'home';
