@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mandarin Playroom</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
@@ -373,6 +373,52 @@
   .bingo-tile.marked{ border-color:var(--bamboo); background:color-mix(in srgb, var(--bamboo) 18%, var(--surface)); cursor:default; }
   .bingo-tile.wrong{ animation:shake .4s ease; border-color:var(--coral); }
 
+
+  /* ---------- write it (tracing) ---------- */
+  .level-chips{ display:flex; gap:10px; flex-wrap:wrap; margin:0 0 16px; }
+  .level-chip{
+    border:3px solid transparent; border-radius:999px; padding:9px 16px; font-weight:800; font-size:14px; cursor:pointer;
+    background:var(--surface); color:var(--ink); box-shadow:0 3px 10px rgba(var(--shadow),0.08);
+  }
+  .level-chip.selected{ border-color:var(--gold); background:color-mix(in srgb, var(--gold) 20%, var(--surface)); }
+  .level-chip.locked{ opacity:.6; }
+  .level-chip.wrong{ animation:shake .4s ease; }
+  .write-layout{ display:grid; grid-template-columns:minmax(150px,210px) minmax(0,1fr); gap:18px; align-items:start; }
+  .write-info{
+    background:var(--surface); border-radius:24px; padding:18px 12px; text-align:center; color:var(--ink);
+    box-shadow:0 3px 16px rgba(var(--shadow),0.10);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .write-info .visual{ font-size:72px; line-height:1; }
+  .write-info .swatch{ width:84px; height:84px; border-radius:50%; font-size:40px; box-shadow: inset 0 -5px 10px rgba(0,0,0,.14); }
+  .write-info .visual-img{ width:90px; height:130px; }
+  .write-info .w-pinyin{ font-size:22px; font-weight:800; color:var(--ink); }
+  .write-info .w-en{ font-size:16px; font-weight:700; color:var(--ink-soft); }
+  .pad-wrap{
+    position:relative; width:100%; background:var(--surface); color:var(--ink);
+    border:4px dashed color-mix(in srgb, var(--ink-soft) 40%, transparent); border-radius:24px; overflow:hidden;
+    box-shadow:0 3px 16px rgba(var(--shadow),0.10);
+  }
+  .pad-wrap.done{ border-style:solid; border-color:var(--bamboo); animation:pop .5s ease; }
+  .pad-wrap canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+  #writeInk{ touch-action:none; cursor:crosshair; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+  .write-meter{ height:14px; border-radius:999px; background:color-mix(in srgb, var(--ink-soft) 25%, transparent); overflow:hidden; margin:14px 0 6px; }
+  .write-meter > div{ height:100%; width:0; background:var(--bamboo); border-radius:999px; transition:width .25s ease; }
+  .write-note{ min-height:22px; font-weight:800; color:var(--ink-soft); margin-bottom:8px; }
+  .write-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .write-btn{
+    border:none; border-radius:999px; padding:11px 18px; font-weight:800; font-size:15px; cursor:pointer;
+    background:var(--surface); color:var(--ink); box-shadow:0 4px 0 rgba(var(--shadow),0.1);
+  }
+  .write-btn:active{ transform:translateY(2px); }
+  @media (max-width:560px){
+    .write-layout{ grid-template-columns:1fr; }
+    .write-info{ flex-direction:row; flex-wrap:wrap; justify-content:center; gap:14px; padding:12px; }
+    .write-info .visual{ font-size:56px; }
+    .write-info .swatch{ width:64px; height:64px; font-size:30px; }
+    .write-info .visual-img{ width:60px; height:90px; }
+  }
+
   /* ---------- sound sort ---------- */
   .sort-buckets{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
   .sort-bucket{
@@ -425,6 +471,8 @@
 </style>
 </head>
 <body>
+
+
 <div class="wrap" id="app"></div>
 
 <script>
@@ -676,7 +724,7 @@
 
   /* ============ progress (per-device, local only) ============ */
   var PROGRESS_KEY = 'mandarin-playroom-progress-v2';
-  var GAME_MODES = ['match','memory','sentence','fillblank','bingo'];
+  var GAME_MODES = ['match','memory','sentence','fillblank','bingo','write'];
   function loadProgress(){
     try{
       var raw = window.localStorage.getItem(PROGRESS_KEY);
@@ -805,6 +853,10 @@
         '<button class="mode-btn" data-mode="bingo" style="--accent:var(--bamboo)">'+
           '<span class="emo">🎯</span><span class="title">Picture Bingo</span>'+
           '<span class="desc">Listen and tap every picture called</span>'+
+        '</button>'+
+        '<button class="mode-btn" data-mode="write" style="--accent:var(--gold)">'+
+          '<span class="emo">✍️</span><span class="title">Write It</span>'+
+          '<span class="desc">Trace the dotted word with your finger</span>'+
         '</button>'+
       '</div>';
 
@@ -1242,6 +1294,339 @@
     });
   }
 
+  /* ============ WRITE IT (tracing) ============
+     Level 1 = dotted outline to trace, Level 2 = fainter dots, Level 3 = from memory (guide hidden, optional hint).
+     Draw with a mouse, finger or Apple Pencil. Progress is measured by how much of the character was covered. */
+  var writeRun = null;   // { subjectId, level, order:[words], idx, locked }
+  var writeLevel = 1;
+  var WRITE_THRESHOLD = { 1:0.5, 2:0.45, 3:0.4 };
+  var WRITE_LEVEL_NAMES = { 1:'Dotted', 2:'Faint', 3:'Memory' };
+  var WRITE_FONT = '"Noto Sans SC","PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif';
+
+  function writeLevelKey(level){ return level === 1 ? 'write' : 'write' + level; }
+  function writeUnlocked(subjectId, level){
+    if (level <= 1) return true;
+    var p = loadProgress()[subjectId] || {};
+    return !!p[writeLevelKey(level - 1)];
+  }
+  function startWrite(subjectId){
+    var s = findSubject(subjectId);
+    if (!writeUnlocked(subjectId, writeLevel)) writeLevel = 1;
+    writeRun = { subjectId: subjectId, level: writeLevel, order: shuffle(s.words).slice(0, 8), idx: 0, locked: false };
+  }
+  function writeColors(){
+    var cs = window.getComputedStyle(document.documentElement);
+    return {
+      soft: (cs.getPropertyValue('--ink-soft') || '').trim() || '#5B6889',
+      ink:  (cs.getPropertyValue('--coral') || '').trim() || '#FF6B5B'
+    };
+  }
+  /* Layout of the writing pad: one square cell per character. */
+  function writeGeometry(hanzi){
+    var chars = Array.from(hanzi), n = chars.length;
+    var W = 600, H = (n === 1) ? 600 : (n === 2 ? 400 : 300);
+    var cellW = W / n;
+    var font = Math.floor(Math.min(H * 0.8, cellW * 0.8));
+    return { chars: chars, n: n, W: W, H: H, cellW: cellW, font: font, brush: Math.max(14, Math.round(font * 0.06)) };
+  }
+  function drawWriteGrid(ctx, g, color){
+    ctx.save();
+    ctx.strokeStyle = color; ctx.globalAlpha = 0.35; ctx.lineWidth = 2; ctx.setLineDash([8, 8]);
+    for (var i = 0; i < g.n; i++){
+      var x0 = i * g.cellW, cx = x0 + g.cellW / 2;
+      ctx.beginPath(); ctx.moveTo(x0 + 10, g.H / 2); ctx.lineTo(x0 + g.cellW - 10, g.H / 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, 10); ctx.lineTo(cx, g.H - 10); ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.globalAlpha = 0.25;
+    for (var j = 1; j < g.n; j++){
+      ctx.beginPath(); ctx.moveTo(j * g.cellW, 0); ctx.lineTo(j * g.cellW, g.H); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  /* Dots along the outline of the character. Built from pixels (not strokeText) so it looks the same with any Chinese font. */
+  function glyphEdgeDots(g, spacing){
+    var c = document.createElement('canvas'); c.width = g.W; c.height = g.H;
+    var x = c.getContext('2d');
+    x.font = '700 ' + g.font + 'px ' + WRITE_FONT; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#000';
+    g.chars.forEach(function(ch, i){ x.fillText(ch, g.cellW * (i + 0.5), g.H / 2 + g.font * 0.04); });
+    var W = g.W, H = g.H, d = x.getImageData(0, 0, W, H).data;
+    function ink(px, py){ return px >= 0 && py >= 0 && px < W && py < H && d[(py * W + px) * 4 + 3] > 128; }
+    var cell = spacing, cols = Math.ceil(W / cell) + 1, grid = {}, dots = [];
+    for (var yy = 0; yy < H; yy++){
+      for (var xx = 0; xx < W; xx++){
+        if (!ink(xx, yy)) continue;
+        if (ink(xx - 1, yy) && ink(xx + 1, yy) && ink(xx, yy - 1) && ink(xx, yy + 1)) continue;
+        var gx = Math.floor(xx / cell), gy = Math.floor(yy / cell), ok = true;
+        for (var a = -1; a <= 1 && ok; a++){
+          for (var b = -1; b <= 1 && ok; b++){
+            var arr = grid[(gy + b) * cols + (gx + a)];
+            if (!arr) continue;
+            for (var k = 0; k < arr.length; k++){
+              var dx = arr[k][0] - xx, dy = arr[k][1] - yy;
+              if (dx * dx + dy * dy < spacing * spacing){ ok = false; break; }
+            }
+          }
+        }
+        if (ok){
+          var key = gy * cols + gx;
+          (grid[key] = grid[key] || []).push([xx, yy]);
+          dots.push([xx, yy]);
+        }
+      }
+    }
+    return dots;
+  }
+  function drawWriteGlyph(ctx, g, style, color){
+    ctx.save();
+    ctx.font = '700 ' + g.font + 'px ' + WRITE_FONT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = color;
+    if (style === 'dotted'){
+      ctx.globalAlpha = 0.16;
+      g.chars.forEach(function(ch, i){ ctx.fillText(ch, g.cellW * (i + 0.5), g.H / 2 + g.font * 0.04); });
+    }
+    var dots = glyphEdgeDots(g, style === 'dotted' ? 11 : 13);
+    ctx.globalAlpha = style === 'dotted' ? 1 : 0.55;
+    var r = style === 'dotted' ? 3 : 2.4;
+    dots.forEach(function(p){ ctx.beginPath(); ctx.arc(p[0] + 0.5, p[1] + 0.5, r, 0, Math.PI * 2); ctx.fill(); });
+    ctx.restore();
+  }
+  /* Low-resolution masks of the character, used to measure how well the child traced it. */
+  function buildWriteMasks(g){
+    var mw = 200, sc = mw / g.W, mh = Math.round(g.H * sc);
+    function make(loose){
+      var c = document.createElement('canvas'); c.width = mw; c.height = mh;
+      var x = c.getContext('2d'); x.scale(sc, sc);
+      x.font = '700 ' + g.font + 'px ' + WRITE_FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillStyle = '#000'; x.strokeStyle = '#000'; x.lineJoin = 'round'; x.lineWidth = g.brush * 1.6;
+      g.chars.forEach(function(ch, i){
+        var cx = g.cellW * (i + 0.5), cy = g.H / 2 + g.font * 0.04;
+        x.fillText(ch, cx, cy);
+        if (loose) x.strokeText(ch, cx, cy);
+      });
+      var d = x.getImageData(0, 0, mw, mh).data, m = new Uint8Array(mw * mh), count = 0;
+      for (var i = 0; i < m.length; i++){ if (d[i * 4 + 3] > 128){ m[i] = 1; count++; } }
+      return { data: m, count: count };
+    }
+    var tmp = document.createElement('canvas'); tmp.width = mw; tmp.height = mh;
+    return { mw: mw, mh: mh, tight: make(false), loose: make(true), tmp: tmp };
+  }
+  function evaluateWrite(inkCanvas, masks){
+    var tctx = masks.tmp.getContext('2d');
+    tctx.clearRect(0, 0, masks.mw, masks.mh);
+    tctx.drawImage(inkCanvas, 0, 0, inkCanvas.width, inkCanvas.height, 0, 0, masks.mw, masks.mh);
+    var d = tctx.getImageData(0, 0, masks.mw, masks.mh).data;
+    var hit = 0, inkTotal = 0, outside = 0;
+    for (var i = 0; i < masks.tight.data.length; i++){
+      if (d[i * 4 + 3] > 40){
+        inkTotal++;
+        if (!masks.loose.data[i]) outside++;
+        if (masks.tight.data[i]) hit++;
+      }
+    }
+    return {
+      coverage: masks.tight.count ? hit / masks.tight.count : 0,
+      scribble: inkTotal > 0 && (outside / inkTotal) > 0.4
+    };
+  }
+
+  function renderWrite(subjectId){
+    var s = findSubject(subjectId);
+    if (!s){ go('home'); return; }
+    if (!writeRun || writeRun.subjectId !== subjectId || writeRun.level !== writeLevel) startWrite(subjectId);
+
+    if (writeRun.idx >= writeRun.order.length){
+      markDone(subjectId, writeLevelKey(writeRun.level));
+      renderWriteCelebrate(s, writeRun.level);
+      return;
+    }
+
+    var level = writeRun.level;
+    var word = writeRun.order[writeRun.idx];
+    var g = writeGeometry(word.hanzi);
+    var thr = WRITE_THRESHOLD[level];
+
+    var dots = writeRun.order.map(function(w, i){
+      var cls = i < writeRun.idx ? 'done' : (i === writeRun.idx ? 'current' : '');
+      return '<span class="dot ' + cls + '"></span>';
+    }).join('');
+
+    var chips = [1, 2, 3].map(function(l){
+      var unlocked = writeUnlocked(subjectId, l);
+      return '<button class="level-chip' + (l === level ? ' selected' : '') + (unlocked ? '' : ' locked') + '" data-level="' + l + '">' +
+        (unlocked ? '' : '🔒 ') + 'Level ' + l + ' · ' + WRITE_LEVEL_NAMES[l] + '</button>';
+    }).join('');
+
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← ' + escapeHtml(s.name) + '</button></div>' +
+      '<h2>Write It · ' + escapeHtml(s.name) + '</h2>' +
+      '<div class="progress-dots">' + dots + '</div>' +
+      '<div class="level-chips">' + chips + '</div>' +
+      '<div class="write-layout">' +
+        '<div class="write-info">' +
+          visualOrTextHtml(word) +
+          '<div class="w-text"><div class="w-pinyin">' + escapeHtml(word.pinyin) + '</div>' +
+          (SETTINGS.hideEnglish ? '' : '<div class="w-en">' + escapeHtml(word.en) + '</div>') + '</div>' +
+          '<button class="write-btn" id="writeHear" type="button">🔊 Hear it</button>' +
+        '</div>' +
+        '<div>' +
+          '<div class="pad-wrap" id="writePad" style="aspect-ratio:' + g.W + '/' + g.H + ';' + (g.n === 1 ? 'max-width:min(100%,480px);' : '') + '">' +
+            '<canvas id="writeGuide"></canvas><canvas id="writeInk"></canvas>' +
+          '</div>' +
+          '<div class="write-meter"><div id="writeMeter"></div></div>' +
+          '<div class="write-note" id="writeNote">' + (level === 1 ? 'Trace over the dots with your finger ✍️' : (level === 2 ? 'Follow the faint dots ✍️' : 'Write it from memory — tap Hint if you need help')) + '</div>' +
+          '<div class="write-actions">' +
+            '<button class="write-btn" id="writeClear" type="button">🧹 Clear</button>' +
+            (level === 3 ? '<button class="write-btn" id="writeHint" type="button">👀 Hint</button>' : '') +
+            '<button class="write-btn" id="writeSkip" type="button">Skip →</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    $('.back-btn', $('#app')).addEventListener('click', function(){ writeRun = null; go('subject', subjectId); });
+    $('#writeHear', $('#app')).addEventListener('click', function(){ speak(word.hanzi, 'zh-CN'); });
+    $all('.level-chip', $('#app')).forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var l = parseInt(btn.getAttribute('data-level'), 10);
+        if (!writeUnlocked(subjectId, l)){
+          btn.classList.add('wrong');
+          var note = $('#writeNote', $('#app'));
+          if (note) note.textContent = '🔒 Finish Level ' + (l - 1) + ' to unlock this level';
+          setTimeout(function(){ btn.classList.remove('wrong'); }, 420);
+          return;
+        }
+        writeLevel = l; writeRun = null; renderWrite(subjectId);
+      });
+    });
+
+    var pad = $('#writePad', $('#app'));
+    var guide = $('#writeGuide', $('#app'));
+    var ink = $('#writeInk', $('#app'));
+    var meter = $('#writeMeter', $('#app'));
+    var note = $('#writeNote', $('#app'));
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    [guide, ink].forEach(function(cv){ cv.width = Math.round(g.W * dpr); cv.height = Math.round(g.H * dpr); });
+    var gctx = guide.getContext('2d'), ictx = ink.getContext('2d');
+    gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ictx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var colors = writeColors();
+    var baseStyle = level === 1 ? 'dotted' : (level === 2 ? 'faint' : null);
+    var masks = null;
+
+    function paintGuide(style){
+      gctx.clearRect(0, 0, g.W, g.H);
+      drawWriteGrid(gctx, g, colors.soft);
+      if (style) drawWriteGlyph(gctx, g, style, colors.soft);
+    }
+    function setupGuide(){
+      paintGuide(baseStyle);
+      masks = buildWriteMasks(g);
+    }
+    setupGuide();
+    /* Make sure the Chinese font has loaded, then redraw so the guide and the scoring mask match. */
+    try{
+      if (document.fonts && document.fonts.load){
+        document.fonts.load('700 100px "Noto Sans SC"', word.hanzi).then(function(){
+          if (document.body.contains(guide)) setupGuide();
+        }).catch(function(){ /* keep fallback font */ });
+      }
+    }catch(e){ /* ignore */ }
+
+    ictx.lineCap = 'round'; ictx.lineJoin = 'round';
+    ictx.strokeStyle = colors.ink; ictx.fillStyle = colors.ink; ictx.lineWidth = g.brush;
+    var drawing = false, last = null;
+
+    function pos(e){
+      var r = ink.getBoundingClientRect();
+      return { x: (e.clientX - r.left) * g.W / r.width, y: (e.clientY - r.top) * g.H / r.height };
+    }
+    function checkProgress(){
+      if (!masks || writeRun.locked) return;
+      var res = evaluateWrite(ink, masks);
+      var pct = Math.min(100, Math.round(res.coverage / thr * 100));
+      meter.style.width = (res.scribble ? 0 : pct) + '%';
+      if (res.scribble){
+        note.textContent = 'Try to stay on the dots 🙂';
+        return;
+      }
+      if (pct >= 100){
+        writeRun.locked = true;
+        pad.classList.add('done');
+        note.textContent = '⭐ Great writing!';
+        playCorrectSound();
+        speak(word.hanzi + '，' + word.en, 'zh-CN');
+        setTimeout(function(){
+          writeRun.idx += 1;
+          writeRun.locked = false;
+          renderWrite(subjectId);
+        }, 1400);
+      } else if (pct >= 60){
+        note.textContent = 'Almost there — keep going!';
+      } else {
+        note.textContent = 'Keep tracing ✍️';
+      }
+    }
+    ink.addEventListener('pointerdown', function(e){
+      if (writeRun.locked) return;
+      e.preventDefault();
+      try{ ink.setPointerCapture(e.pointerId); }catch(err){ /* ignore */ }
+      drawing = true;
+      last = pos(e);
+      ictx.beginPath(); ictx.arc(last.x, last.y, g.brush / 2, 0, Math.PI * 2); ictx.fill();
+    });
+    ink.addEventListener('pointermove', function(e){
+      if (!drawing) return;
+      e.preventDefault();
+      var p = pos(e);
+      ictx.beginPath(); ictx.moveTo(last.x, last.y); ictx.lineTo(p.x, p.y); ictx.stroke();
+      last = p;
+    });
+    function endStroke(){ if (!drawing) return; drawing = false; checkProgress(); }
+    ink.addEventListener('pointerup', endStroke);
+    ink.addEventListener('pointercancel', endStroke);
+
+    $('#writeClear', $('#app')).addEventListener('click', function(){
+      if (writeRun.locked) return;
+      ictx.clearRect(0, 0, g.W, g.H);
+      meter.style.width = '0%';
+      note.textContent = 'Fresh start! ✍️';
+    });
+    var hintBtn = $('#writeHint', $('#app'));
+    if (hintBtn) hintBtn.addEventListener('click', function(){
+      paintGuide('dotted');
+      setTimeout(function(){ if (document.body.contains(guide)) paintGuide(baseStyle); }, 2500);
+    });
+    $('#writeSkip', $('#app')).addEventListener('click', function(){
+      if (writeRun.locked) return;
+      writeRun.idx += 1;
+      renderWrite(subjectId);
+    });
+    speak(word.hanzi, 'zh-CN');
+  }
+
+  function renderWriteCelebrate(s, level){
+    var hasNext = level < 3;
+    $('#app').innerHTML =
+      '<div class="top"><button class="back-btn">← ' + escapeHtml(s.name) + '</button></div>' +
+      '<div class="celebrate">' +
+        '<div class="big-emoji">✍️</div>' +
+        '<h2>Beautiful writing!</h2>' +
+        '<p>You finished Level ' + level + ' (' + WRITE_LEVEL_NAMES[level] + ') for ' + escapeHtml(s.name) + '.' +
+          (hasNext ? ' Level ' + (level + 1) + ' is unlocked!' : '') + '</p>' +
+        '<div class="stars-row">⭐⭐⭐</div>' +
+        '<div class="btn-col">' +
+          (hasNext ? '<button class="btn primary" id="writeNextBtn">Next level →</button>' : '') +
+          '<button class="btn ' + (hasNext ? 'secondary' : 'primary') + '" id="writeAgainBtn">Play Again</button>' +
+          '<button class="btn secondary" id="writeBackBtn">Back to ' + escapeHtml(s.name) + '</button>' +
+        '</div>' +
+      '</div>';
+    $('.back-btn', $('#app')).addEventListener('click', function(){ writeRun = null; go('subject', s.id); });
+    $('#writeAgainBtn', $('#app')).addEventListener('click', function(){ writeLevel = level; writeRun = null; go('write', s.id); });
+    $('#writeBackBtn', $('#app')).addEventListener('click', function(){ writeRun = null; go('subject', s.id); });
+    var nextBtn = $('#writeNextBtn', $('#app'));
+    if (nextBtn) nextBtn.addEventListener('click', function(){ writeLevel = level + 1; writeRun = null; go('write', s.id); });
+  }
+
   /* ============ SOUND SORT (cross-subject) ============ */
   var sortSelection = ['animals', 'colors'];
   var sortRun = null; // { aId, bId, queue:[{word,subjectId}], idx }
@@ -1473,6 +1858,7 @@
     else if (STATE.view === 'sentence') renderSentenceBuilder(STATE.subjectId);
     else if (STATE.view === 'fillblank') renderFillBlank(STATE.subjectId);
     else if (STATE.view === 'bingo') renderBingo(STATE.subjectId);
+    else if (STATE.view === 'write') renderWrite(STATE.subjectId);
     else if (STATE.view === 'sortPicker') renderSortPicker();
     else if (STATE.view === 'soundSort') renderSoundSort();
     else if (STATE.view === 'songs') renderSongs();
@@ -1491,7 +1877,7 @@
 
   function boot(data){
     if (data && data.view){
-      var gameViews = ['match','memory','sentence','fillblank','bingo','soundSort','sortPicker'];
+      var gameViews = ['match','memory','sentence','fillblank','bingo','write','soundSort','sortPicker'];
       STATE.view = (gameViews.indexOf(data.view) !== -1) ? (data.subjectId ? 'subject' : 'home') : data.view;
       STATE.subjectId = data.subjectId || null;
       if (STATE.view === 'subject' && !findSubject(STATE.subjectId)) STATE.view = 'home';
@@ -1509,5 +1895,6 @@
   }catch(e){ boot(null); }
 })();
 </script>
+
 </body>
 </html>
