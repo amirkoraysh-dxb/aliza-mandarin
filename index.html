@@ -267,6 +267,21 @@
   .prompt-card .hanzi{ font-size:64px; font-weight:700; line-height:1; }
   .prompt-card .pinyin{ font-size:22px; color:var(--ink-soft); font-weight:700; margin-top:6px; }
   .prompt-card .tap-hint{ font-size:14px; color:var(--ink-soft); margin-top:10px; font-weight:600; }
+  .prompt-card .pic{ display:flex; justify-content:center; margin-bottom:8px; }
+  .prompt-card .pic .visual{ font-size:64px; line-height:1; }
+  .prompt-card .pic .swatch{ width:64px; height:64px; border-radius:50%; font-size:30px; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -5px 10px rgba(0,0,0,.14); }
+  .prompt-card .pic .visual-img{ width:64px; height:96px; }
+  .prompt-card .en-big{ font-size:34px; font-weight:800; line-height:1.15; color:var(--ink); }
+  .dir-row{ display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 14px; }
+  .dir-chip{
+    border:3px solid transparent; border-radius:999px; padding:9px 16px; font-weight:800; font-size:14px; cursor:pointer;
+    background:var(--surface); color:var(--ink); box-shadow:0 2px 8px rgba(var(--shadow),0.10);
+  }
+  .dir-chip.selected{ border-color:var(--coral); background:color-mix(in srgb, var(--coral) 18%, var(--surface)); }
+  .choice-grid.hz-grid{ grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+  .choice-tile.hz{ aspect-ratio:auto; min-height:110px; flex-direction:column; gap:4px; padding:14px 8px; }
+  .choice-tile.hz .hz-hanzi{ font-size:34px; font-weight:700; line-height:1.15; color:var(--ink); }
+  .choice-tile.hz .hz-pinyin{ font-size:14px; font-weight:700; color:var(--ink-soft); }
   .blank-mark{ display:inline-block; min-width:64px; border-bottom:4px solid var(--ink-soft); margin:0 6px; }
 
   .choice-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:16px; }
@@ -1016,6 +1031,10 @@
     matchRun = { subjectId: subjectId, order: shuffle(s.words), idx: 0, locked:false };
   }
 
+  var MATCH_DIR_KEY = 'mandarin-playroom-matchdir-v1';
+  var matchDir = 'pic';
+  try{ if (window.localStorage.getItem(MATCH_DIR_KEY) === 'en') matchDir = 'en'; }catch(e){ /* ignore */ }
+
   function renderMatch(subjectId){
     if (!matchRun || matchRun.subjectId !== subjectId) startMatch(subjectId);
     var s = findSubject(subjectId);
@@ -1026,6 +1045,7 @@
       return;
     }
 
+    var enMode = (matchDir === 'en');
     var target = matchRun.order[matchRun.idx];
     var distractors = shuffle(s.words.filter(function(w){ return w.hanzi !== target.hanzi; })).slice(0,3);
     var choices = shuffle([target].concat(distractors));
@@ -1036,25 +1056,54 @@
     }).join('');
 
     var choiceHtml = choices.map(function(w, i){
+      if (enMode){
+        return '<button class="choice-tile hz" data-hanzi="'+escapeHtml(w.hanzi)+'" data-i="'+i+'">'+
+          '<span class="hz-hanzi">'+escapeHtml(w.hanzi)+'</span>'+
+          '<span class="hz-pinyin">'+escapeHtml(w.pinyin)+'</span></button>';
+      }
       return '<button class="choice-tile" data-hanzi="'+escapeHtml(w.hanzi)+'" data-i="'+i+'">'+visualOrTextHtml(w)+'</button>';
     }).join('');
+
+    var promptHtml = enMode
+      ? ('<button class="prompt-card" id="promptCard">'+
+          (SETTINGS.hideImages ? '' : '<div class="pic">'+visualHtml(target)+'</div>')+
+          '<div class="en-big">'+escapeHtml(target.en)+'</div>'+
+          '<div class="tap-hint">Find the Chinese word · tap to hear it in English</div>'+
+        '</button>')
+      : ('<button class="prompt-card" id="promptCard">'+
+          '<div class="hanzi">'+escapeHtml(target.hanzi)+'</div>'+
+          '<div class="pinyin">'+escapeHtml(target.pinyin)+'</div>'+
+          '<div class="tap-hint">🔊 Tap to hear it again</div>'+
+        '</button>');
 
     $('#app').innerHTML =
       '<div class="top">'+
         '<button class="back-btn">← '+escapeHtml(s.name)+'</button>'+
       '</div>'+
       '<h2>Match-Up · '+escapeHtml(s.name)+'</h2>'+
+      '<div class="dir-row">'+
+        '<button class="dir-chip'+(enMode ? '' : ' selected')+'" data-dir="pic">🔊 Chinese → Picture</button>'+
+        '<button class="dir-chip'+(enMode ? ' selected' : '')+'" data-dir="en">🇬🇧 English → Chinese</button>'+
+      '</div>'+
       '<div class="progress-dots">'+dots+'</div>'+
-      '<button class="prompt-card" id="promptCard">'+
-        '<div class="hanzi">'+escapeHtml(target.hanzi)+'</div>'+
-        '<div class="pinyin">'+escapeHtml(target.pinyin)+'</div>'+
-        '<div class="tap-hint">🔊 Tap to hear it again</div>'+
-      '</button>'+
-      '<div class="choice-grid">'+choiceHtml+'</div>';
+      promptHtml+
+      '<div class="choice-grid'+(enMode ? ' hz-grid' : '')+'">'+choiceHtml+'</div>';
 
     $('.back-btn', $('#app')).addEventListener('click', function(){ matchRun=null; go('subject', subjectId); });
-    $('#promptCard', $('#app')).addEventListener('click', function(){ speak(target.hanzi, 'zh-CN'); });
-    speak(target.hanzi, 'zh-CN');
+    $all('.dir-chip', $('#app')).forEach(function(chip){
+      chip.addEventListener('click', function(){
+        var d = chip.getAttribute('data-dir');
+        if (d === matchDir) return;
+        matchDir = d;
+        try{ window.localStorage.setItem(MATCH_DIR_KEY, d); }catch(e){ /* ignore */ }
+        matchRun = null;
+        renderMatch(subjectId);
+      });
+    });
+    $('#promptCard', $('#app')).addEventListener('click', function(){
+      if (enMode) speak(target.en, 'en-US'); else speak(target.hanzi, 'zh-CN');
+    });
+    if (enMode) speak(target.en, 'en-US'); else speak(target.hanzi, 'zh-CN');
 
     $all('.choice-tile', $('#app')).forEach(function(tile){
       tile.addEventListener('click', function(){
