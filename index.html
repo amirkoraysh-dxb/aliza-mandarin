@@ -559,7 +559,6 @@
 </head>
 <body>
 
-
 <div class="wrap" id="app"></div>
 
 <script>
@@ -646,6 +645,18 @@
       ]
     },
     {
+      id: 'drinks', name: 'Drinks', icon: '🥤', accent: 'sky',
+      sentence: { zhPrefix:'我喜欢喝', zhPrefixPinyin:'Wǒ xǐhuan hē', zhSuffix:'。', enPrefix:'I like to drink ', enSuffix:'.' },
+      words: [
+        { en:'Water', hanzi:'水', pinyin:'shuǐ', emoji:'💧' },
+        { en:'Juice', hanzi:'果汁', pinyin:'guǒzhī', emoji:'🧃' },
+        { en:'Milk', hanzi:'牛奶', pinyin:'niúnǎi', emoji:'🥛' },
+        { en:'Milkshake', hanzi:'奶昔', pinyin:'nǎixī', emoji:'🥤' },
+        { en:'Yogurt', hanzi:'酸奶', pinyin:'suānnǎi', emoji:'🥣' },
+        { en:'Hot chocolate', hanzi:'热巧克力', pinyin:'rèqiǎokèlì', emoji:'☕' }
+      ]
+    },
+    {
       id: 'family', name: 'Family', icon: '👪', accent: 'purple',
       sentence: { zhPrefix:'这是我的', zhPrefixPinyin:'Zhè shì wǒ de', zhSuffix:'。', enPrefix:'This is my ', enSuffix:'.' },
       words: [
@@ -684,8 +695,19 @@
         { en:'Nineteen', hanzi:'十九', pinyin:'shíjiǔ', emoji:'19' },
         { en:'Twenty', hanzi:'二十', pinyin:'èrshí', emoji:'20' }
       ]
+    },
+    {
+      /* Revision: a fresh random mix of words from every other subject, rebuilt each time it is opened. */
+      id: 'revision', name: 'Revision', icon: '🔁', accent: 'purple', revision: true,
+      sentence: { zhPrefix:'这是', zhPrefixPinyin:'Zhè shì', zhSuffix:'。', enPrefix:'This is ', enSuffix:'.' },
+      words: []
     }
   ];
+  function refreshRevision(s){
+    var pool = [];
+    SUBJECTS.forEach(function(o){ if (!o.revision) o.words.forEach(function(w){ pool.push(w); }); });
+    s.words = shuffle(pool).slice(0, 9);
+  }
 
   /* ============ SONGS ============
      Simple sing-along songs: each line has hanzi, pinyin and an English translation.
@@ -859,6 +881,7 @@
 
   /* ============ HOME ============ */
   function renderHome(){
+    SUBJECTS.forEach(function(o){ if (o.revision) refreshRevision(o); });
     var progress = loadProgress();
     var tiles = SUBJECTS.map(function(s){
       var done = progress[s.id] || {};
@@ -906,6 +929,7 @@
   function renderSubject(id){
     var s = findSubject(id);
     if (!s){ go('home'); return; }
+    if (s.revision && !s.words.length) refreshRevision(s);
     var cards = s.words.map(function(w){
       return (
         '<button class="word-card" data-hanzi="'+escapeHtml(w.hanzi)+'">'+
@@ -965,6 +989,10 @@
     $all('.word-card', $('#app')).forEach(function(btn, i){
       btn.addEventListener('click', function(){ speak(s.words[i].hanzi, 'zh-CN'); });
     });
+    if (s.revision){
+      /* Sentence games need one shared sentence pattern, so Revision only offers the word games. */
+      $all('.mode-btn[data-mode="sentence"], .mode-btn[data-mode="fillblank"]', $('#app')).forEach(function(b){ b.parentNode.removeChild(b); });
+    }
     $all('.mode-btn', $('#app')).forEach(function(btn){
       btn.addEventListener('click', function(){ go(btn.getAttribute('data-mode'), s.id); });
     });
@@ -1425,22 +1453,30 @@
   /* Layout of the writing pad: one square cell per character. */
   function writeGeometry(hanzi){
     var chars = Array.from(hanzi), n = chars.length;
-    var W = 600, H = (n === 1) ? 600 : (n === 2 ? 400 : 300);
-    var cellW = W / n;
-    var font = Math.floor(Math.min(H * 0.8, cellW * 0.8));
-    return { chars: chars, n: n, W: W, H: H, cellW: cellW, font: font, brush: Math.max(14, Math.round(font * 0.06)) };
+    /* 1-3 characters sit in one row; 4 or more wrap into rows of 2 so each character stays big. */
+    var cols = (n >= 4) ? 2 : n, rows = Math.ceil(n / cols);
+    var W = 600, H = (rows > 1) ? 600 : (n === 1 ? 600 : (n === 2 ? 400 : 300));
+    var cw = W / cols, ch = H / rows;
+    var font = Math.floor(Math.min(ch * 0.8, cw * 0.8));
+    var cells = chars.map(function(c, i){
+      var col = i % cols, row = Math.floor(i / cols);
+      return { x0: col * cw, y0: row * ch, w: cw, h: ch, cx: col * cw + cw / 2, cy: row * ch + ch / 2 + font * 0.04 };
+    });
+    return { chars: chars, n: n, cols: cols, rows: rows, W: W, H: H, cells: cells, font: font, brush: Math.max(14, Math.round(font * 0.06)) };
   }
   function drawWriteGrid(ctx, g, color){
     ctx.save();
     ctx.strokeStyle = color; ctx.globalAlpha = 0.35; ctx.lineWidth = 2; ctx.setLineDash([8, 8]);
-    for (var i = 0; i < g.n; i++){
-      var x0 = i * g.cellW, cx = x0 + g.cellW / 2;
-      ctx.beginPath(); ctx.moveTo(x0 + 10, g.H / 2); ctx.lineTo(x0 + g.cellW - 10, g.H / 2); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx, 10); ctx.lineTo(cx, g.H - 10); ctx.stroke();
-    }
+    g.cells.forEach(function(c){
+      ctx.beginPath(); ctx.moveTo(c.x0 + 10, c.y0 + c.h / 2); ctx.lineTo(c.x0 + c.w - 10, c.y0 + c.h / 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(c.cx, c.y0 + 10); ctx.lineTo(c.cx, c.y0 + c.h - 10); ctx.stroke();
+    });
     ctx.setLineDash([]); ctx.globalAlpha = 0.25;
-    for (var j = 1; j < g.n; j++){
-      ctx.beginPath(); ctx.moveTo(j * g.cellW, 0); ctx.lineTo(j * g.cellW, g.H); ctx.stroke();
+    for (var j = 1; j < g.cols; j++){
+      ctx.beginPath(); ctx.moveTo(j * g.W / g.cols, 0); ctx.lineTo(j * g.W / g.cols, g.H); ctx.stroke();
+    }
+    for (var r = 1; r < g.rows; r++){
+      ctx.beginPath(); ctx.moveTo(0, r * g.H / g.rows); ctx.lineTo(g.W, r * g.H / g.rows); ctx.stroke();
     }
     ctx.restore();
   }
@@ -1449,7 +1485,7 @@
     var c = document.createElement('canvas'); c.width = g.W; c.height = g.H;
     var x = c.getContext('2d');
     x.font = '700 ' + g.font + 'px ' + WRITE_FONT; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillStyle = '#000';
-    g.chars.forEach(function(ch, i){ x.fillText(ch, g.cellW * (i + 0.5), g.H / 2 + g.font * 0.04); });
+    g.chars.forEach(function(ch, i){ x.fillText(ch, g.cells[i].cx, g.cells[i].cy); });
     var W = g.W, H = g.H, d = x.getImageData(0, 0, W, H).data;
     function ink(px, py){ return px >= 0 && py >= 0 && px < W && py < H && d[(py * W + px) * 4 + 3] > 128; }
     var cell = spacing, cols = Math.ceil(W / cell) + 1, grid = {}, dots = [];
@@ -1484,7 +1520,7 @@
     ctx.fillStyle = color;
     if (style === 'dotted'){
       ctx.globalAlpha = 0.16;
-      g.chars.forEach(function(ch, i){ ctx.fillText(ch, g.cellW * (i + 0.5), g.H / 2 + g.font * 0.04); });
+      g.chars.forEach(function(ch, i){ ctx.fillText(ch, g.cells[i].cx, g.cells[i].cy); });
     }
     var dots = glyphEdgeDots(g, style === 'dotted' ? 11 : 13);
     ctx.globalAlpha = style === 'dotted' ? 1 : 0.55;
@@ -1501,7 +1537,7 @@
       x.font = '700 ' + g.font + 'px ' + WRITE_FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
       x.fillStyle = '#000'; x.strokeStyle = '#000'; x.lineJoin = 'round'; x.lineWidth = g.brush * 1.6;
       g.chars.forEach(function(ch, i){
-        var cx = g.cellW * (i + 0.5), cy = g.H / 2 + g.font * 0.04;
+        var cx = g.cells[i].cx, cy = g.cells[i].cy;
         x.fillText(ch, cx, cy);
         if (loose) x.strokeText(ch, cx, cy);
       });
@@ -1571,7 +1607,7 @@
           '<button class="write-btn" id="writeHear" type="button">🔊 Hear it</button>' +
         '</div>' +
         '<div>' +
-          '<div class="pad-wrap" id="writePad" style="aspect-ratio:' + g.W + '/' + g.H + ';' + (g.n === 1 ? 'max-width:min(100%,480px);' : '') + '">' +
+          '<div class="pad-wrap" id="writePad" style="aspect-ratio:' + g.W + '/' + g.H + ';' + (g.W === g.H ? 'max-width:min(100%,480px);' : '') + '">' +
             '<canvas id="writeGuide"></canvas><canvas id="writeInk"></canvas>' +
           '</div>' +
           '<div class="write-meter"><div id="writeMeter"></div></div>' +
@@ -1734,7 +1770,7 @@
 
   function renderSortPicker(){
     var canStart = sortSelection.length === 2;
-    var chips = SUBJECTS.map(function(s){
+    var chips = SUBJECTS.filter(function(s){ return !s.revision; }).map(function(s){
       var sel = sortSelection.indexOf(s.id) !== -1;
       return '<button class="sort-chip'+(sel?' selected':'')+'" data-id="'+s.id+'">'+s.icon+' '+escapeHtml(s.name)+'</button>';
     }).join('');
@@ -1932,6 +1968,9 @@
     { id:'morning',   group:'Greetings',     emoji:'🌅', hanzi:'你早！',       pinyin:'Nǐ zǎo!',            en:'Good morning!',          parts:['你','早','！'] },
     { id:'morning-t', group:'Greetings',     emoji:'☀️', hanzi:'老师早！',     pinyin:'Lǎoshī zǎo!',        en:'Good morning, teacher!', parts:['老师','早','！'] },
     { id:'everyone',  group:'Greetings',     emoji:'🙌', hanzi:'大家好！',     pinyin:'Dàjiā hǎo!',         en:'Hello, everyone!',       parts:['大家','好','！'] },
+    { id:'howru',     group:'Greetings',     emoji:'🤝', hanzi:'你好吗？',     pinyin:'Nǐ hǎo ma?',         en:'How are you?',           parts:['你','好吗','？'] },
+    { id:'fine',      group:'Greetings',     emoji:'😄', hanzi:'我很好！',     pinyin:'Wǒ hěn hǎo!',        en:'I am very well!',        parts:['我','很','好','！'] },
+    { id:'bye',       group:'Greetings',     emoji:'👋', hanzi:'再见！',       pinyin:'Zài jiàn!',          en:'Goodbye!',               parts:['再','见','！'] },
     { id:'name-q',    group:'Name and age',  emoji:'🏷️', hanzi:'你叫什么名字？', pinyin:'Nǐ jiào shénme míngzi?', en:'What is your name?',  parts:['你','叫','什么','名字','？'] },
     { id:'name-a',    group:'Name and age',  emoji:'🙋', hanzi:'我叫大卫。',   pinyin:'Wǒ jiào Dàwèi.',     en:'My name is David.',      parts:['我','叫','大卫','。'] },
     { id:'age-q',     group:'Name and age',  emoji:'🎂', hanzi:'你几岁？',     pinyin:'Nǐ jǐ suì?',         en:'How old are you?',       parts:['你','几','岁','？'] },
@@ -1952,14 +1991,14 @@
   }
   function foodSentences(){
     var out = [];
-    ['fruits','vegetables','food'].forEach(function(sid){
+    ['fruits','vegetables','food','drinks'].forEach(function(sid){
       var s = findSubject(sid); if (!s) return;
       s.words.forEach(function(w){
         var pre = s.sentence.zhPrefix;
         var parts = (pre.charAt(0) === '我') ? ['我', pre.slice(1), w.hanzi, '。'] : [pre, w.hanzi, '。'];
         var en = sentenceEn(s, w); en = en.charAt(0).toUpperCase() + en.slice(1);
         out.push({
-          id:'eat-' + sid + '-' + w.hanzi, group:'I love to eat · ' + s.name, emoji:w.emoji,
+          id:'eat-' + sid + '-' + w.hanzi, group:(sid === 'drinks' ? 'I like to drink · ' : 'I love to eat · ') + s.name, emoji:w.emoji,
           hanzi:sentenceZh(s, w), pinyin:s.sentence.zhPrefixPinyin + ' ' + w.pinyin + '.', en:en, parts:parts
         });
       });
@@ -1982,7 +2021,7 @@
   function renderSentences(){
     var pool = sentPool(), mem = loadMemorized();
     var known = pool.filter(function(p){ return mem[p.id]; }).length;
-    var scopes = [['talk','💬 Everyday'], ['eat','🍽️ I love to eat…'], ['all','⭐ All']];
+    var scopes = [['talk','💬 Everyday'], ['eat','🍽️ Food & drinks'], ['all','⭐ All']];
     var chips = scopes.map(function(sc){
       return '<button class="scope-chip' + (sentScope === sc[0] ? ' selected' : '') + '" data-scope="' + sc[0] + '">' + sc[1] + '</button>';
     }).join('');
