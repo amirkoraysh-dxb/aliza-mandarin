@@ -672,6 +672,17 @@
       ]
     },
     {
+      id: 'body', name: 'Body Parts', icon: '🙂', accent: 'bamboo',
+      sentence: { zhPrefix:'我有', zhPrefixPinyin:'Wǒ yǒu', zhSuffix:'。', enPrefix:'I have ', enSuffix:'.' },
+      words: [
+        { en:'Eyes', hanzi:'眼睛', pinyin:'yǎnjing', emoji:'👀' },
+        { en:'Eyebrows', hanzi:'眉毛', pinyin:'méimao', emoji:'🤨' },
+        { en:'Nose', enSentence:'a nose', hanzi:'鼻子', pinyin:'bízi', emoji:'👃' },
+        { en:'Ears', hanzi:'耳朵', pinyin:'ěrduo', emoji:'👂' },
+        { en:'Mouth', enSentence:'a mouth', hanzi:'嘴巴', pinyin:'zuǐba', emoji:'👄' }
+      ]
+    },
+    {
       id: 'family', name: 'Family', icon: '👪', accent: 'purple',
       sentence: { zhPrefix:'这是我的', zhPrefixPinyin:'Zhè shì wǒ de', zhSuffix:'。', enPrefix:'This is my ', enSuffix:'.' },
       words: [
@@ -810,7 +821,7 @@
     return null;
   }
   function sentenceZh(subject, word){ return subject.sentence.zhPrefix + word.hanzi + subject.sentence.zhSuffix; }
-  function sentenceEn(subject, word){ return subject.sentence.enPrefix + word.en.toLowerCase() + subject.sentence.enSuffix; }
+  function sentenceEn(subject, word){ return subject.sentence.enPrefix + (word.enSentence || word.en.toLowerCase()) + subject.sentence.enSuffix; }
 
   /* Picture for a word: a real image file, an emoji (optionally on a colored swatch), or a plain swatch. */
   function visualHtml(word){
@@ -1379,7 +1390,7 @@
       '<div class="progress-dots">'+dots+'</div>'+
       '<button class="prompt-card" id="fbPrompt">'+
         '<div class="hanzi">'+escapeHtml(s.sentence.zhPrefix)+'<span class="blank-mark">___</span></div>'+
-        '<div class="pinyin">'+escapeHtml(s.sentence.zhPrefixPinyin)+' ___</div>'+
+        '<div class="pinyin">'+escapeHtml(s.sentence.zhPrefixPinyin)+' ___'+(s.sentence.zhSuffixPinyin ? ' '+escapeHtml(s.sentence.zhSuffixPinyin) : '')+'</div>'+
         '<div class="tap-hint">🔊 Tap to hear the sentence start</div>'+
       '</button>'+
       '<div class="choice-grid">'+choiceHtml+'</div>';
@@ -2029,7 +2040,16 @@
     { id:'welcome',   group:'Good manners',  emoji:'🤗', hanzi:'不客气！',     pinyin:'Bú kèqi!',           en:'You are welcome!',       parts:['不','客气','！'] },
     { id:'sorry',     group:'Good manners',  emoji:'😔', hanzi:'对不起！',     pinyin:'Duìbuqǐ!',           en:'I am sorry!',            parts:['对','不','起','！'] },
     { id:'nevermind', group:'Good manners',  emoji:'👍', hanzi:'没关系！',     pinyin:'Méi guānxi!',        en:'Never mind! It is OK!',  parts:['没','关系','！'] },
-    { id:'buying',    group:'From the song', emoji:'🛒', hanzi:'你买什么？',   pinyin:'Nǐ mǎi shénme?',     en:'What are you buying?',   parts:['你','买','什么','？'] }
+    { id:'love-zh',   group:'Class talk',    emoji:'❤️', hanzi:'我爱学中文！', pinyin:'Wǒ ài xué Zhōngwén!', en:'I love learning Chinese!', parts:['我','爱','学','中文','！'] },
+    { id:'clap',      group:'From the songs', emoji:'👏', hanzi:'小手拍拍！',   pinyin:'Xiǎo shǒu pāi pāi!', en:'Clap your little hands!', parts:['小手','拍','拍','！'] },
+    { id:'eyes-q',    group:'From the songs', emoji:'🔍', hanzi:'眼睛在哪里？', pinyin:'Yǎnjing zài nǎlǐ?',  en:'Where are your eyes?',   parts:['眼睛','在','哪里','？'] },
+    { id:'eyes-a',    group:'From the songs', emoji:'👀', hanzi:'眼睛在这里！', pinyin:'Yǎnjing zài zhèlǐ!', en:'Here are my eyes!',      parts:['眼睛','在','这里','！'] },
+    { id:'buying',    group:'From the songs', emoji:'🛒', hanzi:'你买什么？',   pinyin:'Nǐ mǎi shénme?',     en:'What are you buying?',   parts:['你','买','什么','？'] },
+    { id:'david-no',  group:'From the story “No, David!”', emoji:'🙅', hanzi:'大卫，不可以！', pinyin:'Dàwèi, bù kěyǐ!',  en:'No, David!',            parts:['大卫','，','不','可以','！'] },
+    { id:'david-back',group:'From the story “No, David!”', emoji:'🏃', hanzi:'大卫，快回来！', pinyin:'Dàwèi, kuài huílái!', en:'David, come back!',  parts:['大卫','，','快','回来','！'] },
+    { id:'quiet',     group:'From the story “No, David!”', emoji:'🤫', hanzi:'不要吵！',     pinyin:'Bú yào chǎo!',       en:'Do not be noisy!',       parts:['不要','吵','！'] },
+    { id:'room',      group:'From the story “No, David!”', emoji:'🚪', hanzi:'回房间去！',   pinyin:'Huí fángjiān qù!',   en:'Go to your room!',       parts:['回','房间','去','！'] },
+    { id:'love-you',  group:'From the story “No, David!”', emoji:'🤗', hanzi:'我爱你！',     pinyin:'Wǒ ài nǐ!',          en:'I love you!',            parts:['我','爱','你','！'] }
   ];
   var SENT_MEM_KEY = 'mandarin-playroom-memorized-v1';
   function loadMemorized(){
@@ -2040,15 +2060,21 @@
   }
   function foodSentences(){
     var out = [];
-    ['fruits','vegetables','food','drinks'].forEach(function(sid){
+    var groupLabel = { drinks:'I like to drink · ', body:'I have · ' };
+    ['fruits','vegetables','food','drinks','body'].forEach(function(sid){
       var s = findSubject(sid); if (!s) return;
       s.words.forEach(function(w){
-        var pre = s.sentence.zhPrefix;
-        var parts = (pre.charAt(0) === '我') ? ['我', pre.slice(1), w.hanzi, '。'] : [pre, w.hanzi, '。'];
+        var pre = s.sentence.zhPrefix, suf = s.sentence.zhSuffix;
+        var parts = (pre.charAt(0) === '我' && pre.length > 1) ? ['我', pre.slice(1)] : [pre];
+        parts.push(w.hanzi);
+        var punc = suf.slice(-1), tail = suf.slice(0, -1);
+        if (tail) parts.push(tail);
+        parts.push(punc);
+        var py = s.sentence.zhPrefixPinyin + ' ' + w.pinyin + (s.sentence.zhSuffixPinyin ? ' ' + s.sentence.zhSuffixPinyin : '') + '.';
         var en = sentenceEn(s, w); en = en.charAt(0).toUpperCase() + en.slice(1);
         out.push({
-          id:'eat-' + sid + '-' + w.hanzi, group:(sid === 'drinks' ? 'I like to drink · ' : 'I love to eat · ') + s.name, emoji:w.emoji,
-          hanzi:sentenceZh(s, w), pinyin:s.sentence.zhPrefixPinyin + ' ' + w.pinyin + '.', en:en, parts:parts
+          id:'eat-' + sid + '-' + w.hanzi, group:(groupLabel[sid] || 'I love to eat · ') + s.name, emoji:w.emoji,
+          hanzi:sentenceZh(s, w), pinyin:py, en:en, parts:parts
         });
       });
     });
@@ -2070,7 +2096,7 @@
   function renderSentences(){
     var pool = sentPool(), mem = loadMemorized();
     var known = pool.filter(function(p){ return mem[p.id]; }).length;
-    var scopes = [['talk','💬 Everyday'], ['eat','🍽️ Food & drinks'], ['all','⭐ All']];
+    var scopes = [['talk','💬 Everyday'], ['eat','🍽️ Food, drinks & body'], ['all','⭐ All']];
     var chips = scopes.map(function(sc){
       return '<button class="scope-chip' + (sentScope === sc[0] ? ' selected' : '') + '" data-scope="' + sc[0] + '">' + sc[1] + '</button>';
     }).join('');
