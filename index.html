@@ -573,7 +573,6 @@
 </style>
 </head>
 <body>
-
 <div class="wrap" id="app"></div>
 
 <script>
@@ -698,6 +697,18 @@
         { en:'Rabbit', hanzi:'兔子', pinyin:'tùzi', emoji:'🐰' },
         { en:'Turtle', hanzi:'乌龟', pinyin:'wūguī', emoji:'🐢' },
         { en:'Goldfish', hanzi:'金鱼', pinyin:'jīnyú', emoji:'🐠' }
+      ]
+    },
+    {
+      id: 'sports', name: 'Sports', icon: '⚽', accent: 'coral',
+      sentence: { zhPrefix:'我喜欢', zhPrefixPinyin:'Wǒ xǐhuan', zhSuffix:'。', enPrefix:'I like ', enSuffix:'.' },
+      words: [
+        { en:'Swimming', enSentence:'swimming', hanzi:'游泳', pinyin:'yóuyǒng', emoji:'🏊' },
+        { en:'Gymnastics', enSentence:'gymnastics', hanzi:'体操', pinyin:'tǐcāo', emoji:'🤸' },
+        { en:'Football', enSentence:'playing football', hanzi:'踢足球', pinyin:'tīzúqiú', emoji:'⚽' },
+        { en:'Taekwondo', enSentence:'taekwondo', hanzi:'跆拳道', pinyin:'táiquándào', emoji:'🥋' },
+        { en:'Scooter', enSentence:'riding a scooter', hanzi:'滑滑板车', pinyin:'huáhuábǎnchē', emoji:'🛴' },
+        { en:'Cycling', enSentence:'cycling', hanzi:'骑自行车', pinyin:'qízìxíngchē', emoji:'🚴' }
       ]
     },
     {
@@ -2083,6 +2094,13 @@
     { id:'pet-eat',   group:'My pets', emoji:'🐟', hanzi:'猫爱吃鱼，不爱吃胡萝卜。', pinyin:'Māo ài chī yú, bú ài chī húluóbo.', en:'The cat loves to eat fish, not carrots.', parts:['猫','爱','吃','鱼','，','不','爱','吃','胡萝卜','。'] },
     { id:'pet-drink', group:'My pets', emoji:'💧', hanzi:'猫爱喝水，不爱喝牛奶。', pinyin:'Māo ài hē shuǐ, bú ài hē niúnǎi.', en:'The cat loves to drink water, not milk.', parts:['猫','爱','喝','水','，','不','爱','喝','牛奶','。'] },
     { id:'pet-love', group:'My pets', emoji:'❤️', hanzi:'我爱我的猫。', pinyin:'Wǒ ài wǒ de māo.', en:'I love my cat.', parts:['我','爱','我的','猫','。'] },
+    { id:'sport-dad', group:'Sports', emoji:'👨', hanzi:'你爸爸喜欢什么运动？', pinyin:'Nǐ bàba xǐhuan shénme yùndòng?', en:'What sport does your dad like?', parts:['你','爸爸','喜欢','什么','运动','？'] },
+    { id:'sport-mom', group:'Sports', emoji:'👩', hanzi:'你妈妈喜欢什么运动？', pinyin:'Nǐ māma xǐhuan shénme yùndòng?', en:'What sport does your mom like?', parts:['你','妈妈','喜欢','什么','运动','？'] },
+    { id:'home-q',    group:'Whose home is this?', emoji:'🏡', hanzi:'这是谁的家？', pinyin:'Zhè shì shéi de jiā?', en:'Whose home is this?', parts:['这','是','谁','的','家','？'] },
+    { id:'home-cat',  group:'Whose home is this?', emoji:'🐱', hanzi:'这是小猫的家。', pinyin:'Zhè shì xiǎomāo de jiā.', en:'This is the kitten’s home.', parts:['这','是','小猫','的','家','。'] },
+    { id:'home-dog',  group:'Whose home is this?', emoji:'🐶', hanzi:'这是小狗的家。', pinyin:'Zhè shì xiǎogǒu de jiā.', en:'This is the puppy’s home.', parts:['这','是','小狗','的','家','。'] },
+    { id:'home-bird', group:'Whose home is this?', emoji:'🐦', hanzi:'这是小鸟的家。', pinyin:'Zhè shì xiǎoniǎo de jiā.', en:'This is the little bird’s home.', parts:['这','是','小鸟','的','家','。'] },
+    { id:'home-teacher', group:'Whose home is this?', emoji:'🧑‍🏫', hanzi:'这是老师的家。', pinyin:'Zhè shì lǎoshī de jiā.', en:'This is the teacher’s home.', parts:['这','是','老师','的','家','。'] },
     { id:'david-no',  group:'From the story “No, David!”', emoji:'🙅', hanzi:'大卫，不可以！', pinyin:'Dàwèi, bù kěyǐ!',  en:'No, David!',            parts:['大卫','，','不','可以','！'] },
     { id:'david-back',group:'From the story “No, David!”', emoji:'🏃', hanzi:'大卫，快回来！', pinyin:'Dàwèi, kuài huílái!', en:'David, come back!',  parts:['大卫','，','快','回来','！'] },
     { id:'quiet',     group:'From the story “No, David!”', emoji:'🤫', hanzi:'不要吵！',     pinyin:'Bú yào chǎo!',       en:'Do not be noisy!',       parts:['不要','吵','！'] },
@@ -2098,8 +2116,8 @@
   }
   function foodSentences(){
     var out = [];
-    var groupLabel = { drinks:'I like to drink · ', body:'I have · ', pets:'At my home · ' };
-    ['fruits','vegetables','food','drinks','body','pets'].forEach(function(sid){
+    var groupLabel = { drinks:'I like to drink · ', body:'I have · ', pets:'At my home · ', sports:'I like · ' };
+    ['fruits','vegetables','food','drinks','body','pets','sports'].forEach(function(sid){
       var s = findSubject(sid); if (!s) return;
       s.words.forEach(function(w){
         var pre = s.sentence.zhPrefix, suf = s.sentence.zhSuffix;
@@ -2493,6 +2511,5 @@
   }catch(e){ boot(null); }
 })();
 </script>
-
 </body>
 </html>
