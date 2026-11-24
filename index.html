@@ -298,6 +298,19 @@
   .choice-tile:hover{ transform:translateY(-2px); }
   .choice-tile.correct{ border-color:var(--bamboo); animation: pop .5s ease; }
   .choice-tile.wrong{ animation: shake .4s ease; border-color:var(--coral); }
+  .choice-tile.selected, .pick-choice.selected{ border-color:var(--sky); transform:translateY(-2px); box-shadow:0 0 0 4px color-mix(in srgb, var(--sky) 30%, transparent); }
+  .choice-tile.correct, .pick-choice.right{ border-color:var(--bamboo); }
+  .choice-tile.selected.wrong{ border-color:var(--coral); }
+  .confirm-bar{ display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap; margin-top:22px; }
+  .hear-btn{ font:inherit; font-weight:800; font-size:17px; color:var(--ink); background:var(--surface); border:3px solid var(--sky); cursor:pointer; padding:11px 22px; border-radius:999px; }
+  .hear-btn:disabled{ opacity:.4; cursor:default; }
+  .confirm-btn{
+    font:inherit; font-weight:800; font-size:20px; color:#fff; border:0; cursor:pointer;
+    background:var(--bamboo); padding:14px 40px; border-radius:999px;
+    box-shadow:0 5px 0 color-mix(in srgb, var(--bamboo) 55%, #000 30%);
+  }
+  .confirm-btn:disabled{ opacity:.4; cursor:default; box-shadow:none; }
+  .confirm-btn:not(:disabled):active{ transform:translateY(3px); box-shadow:0 2px 0 color-mix(in srgb, var(--bamboo) 55%, #000 30%); }
 
   @keyframes pop{ 0%{transform:scale(1);} 40%{transform:scale(1.12);} 100%{transform:scale(1);} }
   @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
@@ -778,6 +791,17 @@
         { hanzi:'你买什么？你买什么？买西红柿，买西红柿！', pinyin:'Nǐ mǎi shénme? Nǐ mǎi shénme? Mǎi xīhóngshì, mǎi xīhóngshì!', en:'What are you buying? What are you buying? Buying tomato, buying tomato!' },
         { hanzi:'你买什么？你买什么？买辣椒，买辣椒！', pinyin:'Nǐ mǎi shénme? Nǐ mǎi shénme? Mǎi làjiāo, mǎi làjiāo!', en:'What are you buying? What are you buying? Buying chili, buying chili!' }
       ]
+    },
+    {
+      id: 'pet-song', title:'I Love My Little Pet', titleHanzi:'我爱我的小猫', icon:'🐾', accent:'purple',
+      lines: [
+        { hanzi:'我爱我的小猫，小猫怎样叫？喵喵喵！', pinyin:'Wǒ ài wǒ de xiǎomāo, xiǎomāo zěnyàng jiào? Miāo miāo miāo!', en:'I love my little cat. How does my cat say? Meow, meow, meow!' },
+        { hanzi:'我爱我的小狗，小狗怎样叫？汪汪汪！', pinyin:'Wǒ ài wǒ de xiǎogǒu, xiǎogǒu zěnyàng jiào? Wāng wāng wāng!', en:'I love my little dog. How does my dog say? Woof, woof, woof!' },
+        { hanzi:'我爱我的小鸟，小鸟怎样叫？喳喳喳！', pinyin:'Wǒ ài wǒ de xiǎoniǎo, xiǎoniǎo zěnyàng jiào? Chāchā chā!', en:'I love my little bird. How does my bird say? Chirp, chirp, chirp!' },
+        { hanzi:'我爱我的乌龟，乌龟爬呀爬！', pinyin:'Wǒ ài wǒ de wūguī, wūguī pá ya pá!', en:'I love my little turtle. My turtle crawls and crawls!' },
+        { hanzi:'我爱我的兔子，兔子跳呀跳！', pinyin:'Wǒ ài wǒ de tùzi, tùzi tiào ya tiào!', en:'I love my little rabbit. My rabbit hops and hops!' },
+        { hanzi:'我爱我的金鱼，金鱼游呀游！', pinyin:'Wǒ ài wǒ de jīnyú, jīnyú yóu ya yóu!', en:'I love my little goldfish. My goldfish swims and swims!' }
+      ]
     }
   ];
 
@@ -836,14 +860,37 @@
     }catch(e){ /* ignore */ }
   }
 
+  var speakKeep = null, speakTimer = null;
+  function pickVoice(lang){
+    try{
+      var vs = window.speechSynthesis.getVoices() || [], want = lang.toLowerCase().replace('_','-'), base = want.split('-')[0];
+      for (var i = 0; i < vs.length; i++) if ((vs[i].lang || '').toLowerCase().replace('_','-') === want) return vs[i];
+      for (var j = 0; j < vs.length; j++) if ((vs[j].lang || '').toLowerCase().indexOf(base) === 0) return vs[j];
+    }catch(e){ /* ignore */ }
+    return null;
+  }
   function speak(text, lang){
     try{
       if (!('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(text);
-      u.lang = lang;
-      u.rate = 0.9;
-      window.speechSynthesis.speak(u);
+      var synth = window.speechSynthesis;
+      if (speakTimer){ clearTimeout(speakTimer); speakTimer = null; }
+      var busy = synth.speaking || synth.pending;
+      function go(){
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = lang;
+        var v = pickVoice(lang); if (v) u.voice = v;
+        u.rate = 0.9;
+        speakKeep = u; /* keep a reference so the browser does not drop it mid-speech */
+        try{ synth.resume(); }catch(e){}
+        synth.speak(u);
+      }
+      if (busy){
+        /* Chrome silently drops a speak() issued in the same moment as cancel(): wait a beat */
+        synth.cancel();
+        speakTimer = setTimeout(go, 120);
+      } else {
+        go();
+      }
     }catch(e){ /* speech not available — fail silently */ }
   }
   function findSubject(id){
@@ -888,8 +935,8 @@
     try{
       var raw = window.localStorage.getItem(SETTINGS_KEY);
       var s = raw ? JSON.parse(raw) : {};
-      return { hideImages: !!s.hideImages, hideEnglish: !!s.hideEnglish };
-    }catch(e){ return { hideImages:false, hideEnglish:false }; }
+      return { hideImages: !!s.hideImages, hideEnglish: !!s.hideEnglish, hearFirst: s.hearFirst !== false };
+    }catch(e){ return { hideImages:false, hideEnglish:false, hearFirst:true }; }
   }
   function saveSettings(s){
     try{ window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }catch(e){ /* ignore */ }
@@ -1012,6 +1059,7 @@
         '<span class="set-label">🎚️ Make it harder:</span>'+
         '<label><input type="checkbox" id="hideImagesChk" '+(SETTINGS.hideImages?'checked':'')+'> Hide pictures</label>'+
         '<label><input type="checkbox" id="hideEnglishChk" '+(SETTINGS.hideEnglish?'checked':'')+'> Hide English</label>'+
+        '<label><input type="checkbox" id="hearFirstChk" '+(SETTINGS.hearFirst?'checked':'')+'> 🔊 Hear first, then confirm</label>'+
       '</div>'+
       '<div class="word-grid">'+cards+'</div>'+
       '<div class="mode-row">'+
@@ -1061,6 +1109,41 @@
       SETTINGS.hideEnglish = this.checked;
       saveSettings(SETTINGS);
       renderSubject(id);
+    });
+    $('#hearFirstChk', $('#app')).addEventListener('change', function(){
+      SETTINGS.hearFirst = this.checked;
+      saveSettings(SETTINGS);
+    });
+  }
+
+  /* ============ hear-first-then-confirm helper ============
+     With SETTINGS.hearFirst on, tapping a choice only selects it and says it aloud;
+     the child then presses Confirm to lock it in. With it off, a tap answers straight away. */
+  function confirmBarHtml(){
+    return SETTINGS.hearFirst ? '<div class="confirm-bar"><button class="hear-btn" id="hearBtn" disabled>🔊 Hear again</button><button class="confirm-btn" id="confirmBtn" disabled>✅ Confirm</button></div>' : '';
+  }
+  function wireChoices(tiles, speakFor, commit, isLocked){
+    if (!SETTINGS.hearFirst){
+      tiles.forEach(function(t){ t.addEventListener('click', function(){ if (!isLocked()) commit(t); }); });
+      return;
+    }
+    var btn = document.getElementById('confirmBtn'), hearBtn = document.getElementById('hearBtn'), sel = null;
+    function clearSel(){ tiles.forEach(function(x){ x.classList.remove('selected'); }); sel = null; btn.disabled = true; hearBtn.disabled = true; }
+    function say(t){ var sp = speakFor(t); if (sp) speak(sp.text, sp.lang); }
+    hearBtn.addEventListener('click', function(){ if (sel) say(sel); });
+    tiles.forEach(function(t){
+      t.addEventListener('click', function(){
+        if (isLocked()) return;
+        sel = t;
+        tiles.forEach(function(x){ x.classList.toggle('selected', x === t); });
+        btn.disabled = false; hearBtn.disabled = false;
+        say(t);
+      });
+    });
+    btn.addEventListener('click', function(){
+      if (isLocked() || !sel) return;
+      var ok = commit(sel);
+      if (ok){ btn.disabled = true; hearBtn.disabled = true; } else setTimeout(clearSel, 420);
     });
   }
 
@@ -1128,7 +1211,7 @@
       '</div>'+
       '<div class="progress-dots">'+dots+'</div>'+
       promptHtml+
-      '<div class="choice-grid'+(enMode ? ' hz-grid' : '')+'">'+choiceHtml+'</div>';
+      '<div class="choice-grid'+(enMode ? ' hz-grid' : '')+'">'+choiceHtml+'</div>'+confirmBarHtml();
 
     $('.back-btn', $('#app')).addEventListener('click', function(){ matchRun=null; go('subject', subjectId); });
     $all('.dir-chip', $('#app')).forEach(function(chip){
@@ -1146,9 +1229,9 @@
     });
     if (enMode) speak(target.en, 'en-US'); else speak(target.hanzi, 'zh-CN');
 
-    $all('.choice-tile', $('#app')).forEach(function(tile){
-      tile.addEventListener('click', function(){
-        if (matchRun.locked) return;
+    wireChoices($all('.choice-tile', $('#app')),
+      function(tile){ return { text: tile.getAttribute('data-hanzi'), lang:'zh-CN' }; },
+      function(tile){
         var isCorrect = tile.getAttribute('data-hanzi') === target.hanzi;
         if (isCorrect){
           matchRun.locked = true;
@@ -1165,8 +1248,9 @@
           playWrongSound();
           setTimeout(function(){ tile.classList.remove('wrong'); }, 420);
         }
-      });
-    });
+        return isCorrect;
+      },
+      function(){ return !!matchRun.locked; });
   }
 
   /* ============ MEMORY GAME ============ */
@@ -1423,15 +1507,15 @@
         '<div class="pinyin">'+escapeHtml(s.sentence.zhPrefixPinyin)+' ___'+(s.sentence.zhSuffixPinyin ? ' '+escapeHtml(s.sentence.zhSuffixPinyin) : '')+'</div>'+
         '<div class="tap-hint">🔊 Tap to hear the sentence start</div>'+
       '</button>'+
-      '<div class="choice-grid">'+choiceHtml+'</div>';
+      '<div class="choice-grid">'+choiceHtml+'</div>'+confirmBarHtml();
 
     $('.back-btn', $('#app')).addEventListener('click', function(){ fbRun=null; go('subject', subjectId); });
     $('#fbPrompt', $('#app')).addEventListener('click', function(){ speak(s.sentence.zhPrefix, 'zh-CN'); });
     speak(s.sentence.zhPrefix, 'zh-CN');
 
-    $all('.choice-tile', $('#app')).forEach(function(tile){
-      tile.addEventListener('click', function(){
-        if (fbRun.locked) return;
+    wireChoices($all('.choice-tile', $('#app')),
+      function(tile){ return { text: tile.getAttribute('data-hanzi'), lang:'zh-CN' }; },
+      function(tile){
         var isCorrect = tile.getAttribute('data-hanzi') === target.hanzi;
         if (isCorrect){
           fbRun.locked = true;
@@ -1448,8 +1532,9 @@
           playWrongSound();
           setTimeout(function(){ tile.classList.remove('wrong'); }, 420);
         }
-      });
-    });
+        return isCorrect;
+      },
+      function(){ return !!fbRun.locked; });
   }
 
   /* ============ PICTURE BINGO ============ */
@@ -2101,6 +2186,14 @@
     { id:'home-dog',  group:'Whose home is this?', emoji:'🐶', hanzi:'这是小狗的家。', pinyin:'Zhè shì xiǎogǒu de jiā.', en:'This is the puppy’s home.', parts:['这','是','小狗','的','家','。'] },
     { id:'home-bird', group:'Whose home is this?', emoji:'🐦', hanzi:'这是小鸟的家。', pinyin:'Zhè shì xiǎoniǎo de jiā.', en:'This is the little bird’s home.', parts:['这','是','小鸟','的','家','。'] },
     { id:'home-teacher', group:'Whose home is this?', emoji:'🧑‍🏫', hanzi:'这是老师的家。', pinyin:'Zhè shì lǎoshī de jiā.', en:'This is the teacher’s home.', parts:['这','是','老师','的','家','。'] },
+    { id:'can-swim', group:'Can you do it?', emoji:'🏊', hanzi:'你会游泳吗？', pinyin:'Nǐ huì yóuyǒng ma?', en:'Can you swim?', parts:['你','会','游泳','吗','？'] },
+    { id:'can-gym',  group:'Can you do it?', emoji:'🤸', hanzi:'你会做体操吗？', pinyin:'Nǐ huì zuò tǐcāo ma?', en:'Can you do gymnastics?', parts:['你','会','做','体操','吗','？'] },
+    { id:'can-ball', group:'Can you do it?', emoji:'⚽', hanzi:'你会踢足球吗？', pinyin:'Nǐ huì tī zúqiú ma?', en:'Can you play football?', parts:['你','会','踢足球','吗','？'] },
+    { id:'can-tkd',  group:'Can you do it?', emoji:'🥋', hanzi:'你会跆拳道吗？', pinyin:'Nǐ huì táiquándào ma?', en:'Can you do taekwondo?', parts:['你','会','跆拳道','吗','？'] },
+    { id:'can-scooter', group:'Can you do it?', emoji:'🛴', hanzi:'你会滑滑板车吗？', pinyin:'Nǐ huì huá huábǎnchē ma?', en:'Can you ride a scooter?', parts:['你','会','滑滑板车','吗','？'] },
+    { id:'can-bike', group:'Can you do it?', emoji:'🚴', hanzi:'你会骑自行车吗？', pinyin:'Nǐ huì qí zìxíngchē ma?', en:'Can you ride a bike?', parts:['你','会','骑自行车','吗','？'] },
+    { id:'can-yes',  group:'Can you do it?', emoji:'✅', hanzi:'我会。', pinyin:'Wǒ huì.', en:'I can.', parts:['我','会','。'] },
+    { id:'can-no',   group:'Can you do it?', emoji:'🙅', hanzi:'我不会。', pinyin:'Wǒ bú huì.', en:'I cannot.', parts:['我','不','会','。'] },
     { id:'david-no',  group:'From the story “No, David!”', emoji:'🙅', hanzi:'大卫，不可以！', pinyin:'Dàwèi, bù kěyǐ!',  en:'No, David!',            parts:['大卫','，','不','可以','！'] },
     { id:'david-back',group:'From the story “No, David!”', emoji:'🏃', hanzi:'大卫，快回来！', pinyin:'Dàwèi, kuài huílái!', en:'David, come back!',  parts:['大卫','，','快','回来','！'] },
     { id:'quiet',     group:'From the story “No, David!”', emoji:'🤫', hanzi:'不要吵！',     pinyin:'Bú yào chǎo!',       en:'Do not be noisy!',       parts:['不要','吵','！'] },
@@ -2279,24 +2372,28 @@
       '<h2>Listen &amp; Pick</h2><div class="progress-dots">' + dots + '</div>' +
       '<button class="say-card listen" id="pickHear"><div class="say-emoji">👂</div><div class="say-hint">Tap to hear the sentence</div></button>' +
       '<div class="pick-reveal" id="pickReveal"></div>' +
-      '<div class="pick-choices">' + choiceHtml + '</div>';
+      '<div class="pick-choices">' + choiceHtml + '</div>' + confirmBarHtml();
     pickRun.locked = false;
     $('.back-btn', $('#app')).addEventListener('click', function(){ pickRun = null; go('sentences'); });
     $('#pickHear', $('#app')).addEventListener('click', function(){ speak(p.hanzi, 'zh-CN'); });
     setTimeout(function(){ if (pickRun && pickRun.ids[pickRun.idx] === p.id && document.getElementById('pickHear')) speak(p.hanzi, 'zh-CN'); }, 350);
-    $all('.pick-choice', $('#app')).forEach(function(b){
-      b.addEventListener('click', function(){
-        if (pickRun.locked) return;
-        if (b.getAttribute('data-id') === p.id){
+    wireChoices($all('.pick-choice', $('#app')),
+      function(b){ var o = sentById(b.getAttribute('data-id')); return o ? { text:o.en, lang:'en-US' } : null; },
+      function(b){
+        var ok = b.getAttribute('data-id') === p.id;
+        if (ok){
           pickRun.locked = true;
           b.classList.add('right'); playCorrectSound();
           $('#pickReveal', $('#app')).innerHTML = '<span class="hanzi">' + escapeHtml(p.hanzi) + '</span> <span class="pinyin">' + escapeHtml(p.pinyin) + '</span>';
+          speak(p.hanzi, 'zh-CN');
           setTimeout(function(){ pickRun.idx += 1; renderSentPick(); }, 1300);
         } else {
           b.classList.add('wrong'); playWrongSound();
+          setTimeout(function(){ b.classList.remove('wrong'); }, 420);
         }
-      });
-    });
+        return ok;
+      },
+      function(){ return !!pickRun.locked; });
   }
 
   /* ---- Build It: tap the words in the right order ---- */
